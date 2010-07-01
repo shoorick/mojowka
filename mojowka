@@ -344,17 +344,13 @@ Text
     });
 </script>
 
-<h1>Change article</h1>
-
-<!--
- if ( defined $errors ) {
+% if ( my $errors = stash 'errors' ) {
     <ul id="errors">
-   for my $error ( @$errors ) {
-        <li><$error></li>
-   }
+%   for my $error ( @$errors ) {
+        <li><%= $error %></li>
+%   }
     </ul>
- }
--->
+% } # if
 
 <form method="post" action="/edit/<%= $id %>">
 <dl>
@@ -415,6 +411,11 @@ Text
             background: #eee;
             border:     1px solid #ccc;
             padding:    0.1em 0.5em;
+        }
+
+        #errors {
+            background: #fdc;
+            border:     1px solid #c00;
         }
 
         dd textarea {

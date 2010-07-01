@@ -1,18 +1,24 @@
-           *            #
-/#.#\ /##\ # /##\ #   # #  # /##\
-# # # #  # # #  # # # # ##<  #  #
-# # # \##/ # \##/ \#^#/ #  # ###\
-           #
+                  ##                    ##
+                                        ##
+ ##  ##    ####   ##   ####   ## ## ##  ## ##   #####
+## ## ##  ##  ##  ##  ##  ##  ## ## ##  ###    ##  ##
+## ## ##  ##  ##  ##  ##  ##  ## ## ##  ## ##  ##  ##
+## ## ##   ####   ##   ####    ##  ##   ##  ##  ### #
+                 ##
+                ##
 
-mojowka - is a lightweight wiki based on top of Mojolicious::Lite
-
-Alexander Sapozhnikov
-http://shoorick.ru/
-shoorick-at-cpan-dot-org
+mojowka - is a lightweight wiki
+based on top of Mojolicious::Lite
 
 Usage:
     ./mojowka COMMAND [OPTIONS]
     Example:
-    ./mojowka --daemon
+    ./mojowka daemon --reload
 
 When COMMAND and OPTIONS are omitted list of available commands will be shown.
+
+Alexander Sapozhnikov
+http://shoorick.ru/
+shoorick@cpan.org
+
+
