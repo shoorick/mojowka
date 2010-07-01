@@ -3,7 +3,7 @@
  ##  ##    ####   ##   ####   ## ## ##  ## ##   #####
 ## ## ##  ##  ##  ##  ##  ##  ## ## ##  ###    ##  ##
 ## ## ##  ##  ##  ##  ##  ##  ## ## ##  ## ##  ##  ##
-## ## ##   ####   ##   ####    ##  ##   ##  ##  ### #
+## ## ##   ####   ##   ####    ##  ##   ##  ##  ### ##
                  ##
                 ##
 
@@ -16,6 +16,12 @@ Usage:
     ./mojowka daemon --reload
 
 When COMMAND and OPTIONS are omitted list of available commands will be shown.
+
+Before first run you must create database:
+    sqlite3 data.sqlite < init.sql
+
+Registered users can change content of pages.
+There's one user: admin with same password.
 
 Alexander Sapozhnikov
 http://shoorick.ru/
