@@ -180,14 +180,14 @@ for article found by its all three parameters: year, topic and name.
 
 sub edit_article {
     my $self = shift;
-    my $id   = $self->param('id') || return;
+    my $id   = $self->param('id'); # digits only - 0 or natural number
+
+    my $article_title   = $self->param('title');
+    my $article_content = $self->param('article');
 
     if ( $self->req->method eq 'POST' ) {
 
         # Validate
-        my $article_title   = $self->param('title');
-        my $article_content = $self->param('article');
-
         my @errors = ();
 
         TRY: {
@@ -223,15 +223,25 @@ sub edit_article {
         } # if errors
         # else OK
 
-        if (
-            $dbh->do(
+        my $rows_affected = 0;
+        if ( $id ) { # > 0 - edit
+            $rows_affected = $dbh->do(
                 q{UPDATE page SET title=?, text=? WHERE id=?},
                 {},
                 $article_title, $article_content, $id
             )
-        ) {
+        } # if exists
+        else { # 0 - new page
+            $rows_affected = $dbh->do(
+                q{INSERT INTO page VALUES(NULL, ?, ?)},
+                {},
+                $article_title, $article_content,
+            )
+        } # else new
+
+        $article_title =~ tr/ /_/;
+        if ( $rows_affected ) {
             $self->flash( 'message' => 'Changes was saved' );
-            $article_title =~ tr/ /_/;
             $self->redirect_to( "/$article_title" );
         }
         # else NOT saved
@@ -249,17 +259,27 @@ sub edit_article {
 
     } # if POST
 
-    my $row = $dbh->selectrow_hashref(q{SELECT * FROM page WHERE id = ?}, {}, $id);
+    if ( $id ) { # existing record
+        my $row = $dbh->selectrow_hashref(q{SELECT * FROM page WHERE id = ?}, {}, $id);
 
-    if ( $row ) {
+        if ( $row ) {
+            return $self->render(
+                'template'          => 'edit_article',
+                'title'             => 'Editing',
+                'id'                => $id,
+                'article_content'   => b($row->{'text'} )->decode('UTF-8'),
+                'article_title'     => b($row->{'title'})->decode('UTF-8'),
+            );
+        } # if $row
+    } # if $id
+    else { # new record
         return $self->render(
             'template'          => 'edit_article',
-            'title'             => 'Editing',
-            'id'                => $id,
-            'article_content'   => b($row->{'text'} )->decode('UTF-8'),
-            'article_title'     => b($row->{'title'})->decode('UTF-8'),
+            'title'             => 'New page',
+            'article_content'   => '',
+            'article_title'     => '',
         );
-    } # if $row
+    } # else
 } # sub edit_article
 
 
@@ -364,7 +384,13 @@ __DATA__
         <style type="text/css">body{background:#fec;color:#000}h1{color:#900}</style>
     </head>
     <body><%== content %>
-    <p>See also:</p><ul><li><a href="/">Main page</a></li><li><a href="/sitemap">Sitemap</a></li></ul>
+        <ul>
+% if ( session 'login' ) {
+        <li><a href="/edit/0?title=">Create page</a></li>
+% }
+        <li><a href="/">Main page</a></li>
+        <li><a href="/sitemap">Sitemap</a></li>
+        </ul>
     </body>
 </html>
 
