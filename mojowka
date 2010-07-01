@@ -22,6 +22,7 @@ use Mojo::ByteStream 'b';
 use Text::Textile;
 use DBI;
 
+
 my $dbfile = 'data.sqlite';
 our $dbh = DBI->connect("dbi:SQLite:dbname=$dbfile", '', '');
 
@@ -273,17 +274,17 @@ sub get_user {
     my $login   = $self->param('login') || return;
 
     my $row = $dbh->selectrow_hashref(
-        q{SELECT id FROM user WHERE login=?},
+        q{SELECT text FROM user WHERE login=?},
         {},
         $login,
     );
 
-    if ( $row ) {
-        return $self->render(
-            'template'          => 'profile',
-            'login'              => $login,
-        );
-    } # if $row
+    return $self->render_text(
+        markup( b( $row->{'text'} )->decode('UTF-8')->to_string ),
+        'title'  => $login,
+        'layout' => 'default',
+    ) if $row;
+
 } # sub get_user
 
 __DATA__
@@ -306,20 +307,14 @@ __DATA__
 <h1>Not found</h1><p>Document you requested was not found.</p>
 
 
-@@ profile.html.ep
-% layout 'default';
-% stash 'title' => $login;
-<p>User was found</p>
-
-
 @@ default.html.ep
 % layout 'default';
 <h1><%= $title %></h1>
 Text
 
+
 @@ edit_article.html.ep
 % layout 'default';
-
 <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.1/jquery.min.js"></script>
 <script type="text/javascript">
     $(document).ready(function() {
@@ -458,4 +453,15 @@ Text
     </body>
 </html>
 
+
+@@ init.sql
+BEGIN TRANSACTION;
+CREATE TABLE "page" ("id" INTEGER PRIMARY KEY AUTOINCREMENT, "title" TEXT, "text" TEXT);
+INSERT INTO "page" VALUES(1,'Index','First page\n\nLightweight wiki *mojowka* based on top of "Mojolicious::Lite":http://search.cpan.org/dist/Mojolicious\n\n"Registered user":/login can change content of pages.');
+INSERT INTO "page" VALUES(2,'Sitemap','* "First page of site":/\n* "This page":/sitemap');
+CREATE TABLE "user" ("id" INTEGER PRIMARY KEY AUTOINCREMENT,"login" TEXT,"password" TEXT);
+INSERT INTO "user" VALUES(1,'admin','21232f297a57a5a743894a0e4a801fc3');
+CREATE UNIQUE INDEX "page_title" on page (title ASC);
+CREATE UNIQUE INDEX "user_login" on user (login ASC);
+COMMIT;
 
