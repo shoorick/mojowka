@@ -1,0 +1,460 @@
+#!/usr/bin/perl
+
+=head1 NAME
+
+mojowka
+
+=head1 DESCRIPTION
+
+mojowka - is a lightweight wiki based on top of Mojolicious::Lite
+
+=head1 AUTHOR
+
+Alexander Sapozhnikov
+L<http://shoorick.ru/>
+L<< E<lt>shoorick@cpan.orgE<gt> >>
+2000-2010
+
+=cut
+
+use Mojolicious::Lite;
+use Mojo::ByteStream 'b';
+use Text::Textile;
+use DBI;
+
+my $dbfile = 'data.sqlite';
+our $dbh = DBI->connect("dbi:SQLite:dbname=$dbfile", '', '');
+
+our $txt = new Text::Textile;
+    $txt->charset('utf-8');
+
+# Routes
+
+any '/' => sub { shift->redirect_to( '/index' ) };
+
+# For security reasons User can login only via POST
+get  '/login' => 'login';
+post '/login' => sub {
+    my $self = shift;
+    my $login    = $self->param('login')    || '';
+
+    my $password = $self->param('password') || '';
+       $password = b($password)->md5_sum;
+
+    my $redirect
+        = $self->param('redirect')
+#        || $self->req->env('HTTP_REFERER')
+        || '/';
+
+    if ( $login ) {
+
+        my $row = $dbh->selectrow_hashref(
+            q{SELECT id FROM user WHERE login=? AND password=?},
+            {},
+            $login, $password
+        );
+
+        if ( $row ) {
+            $self->session( 'login' => $login );
+            $self->flash( 'message' => 'Thanks for logging in' );
+        }
+        else {
+              $self->flash( 'message' => 'Wrong username or password' );
+              $redirect = '/login';
+        }
+    }
+    else {
+          $redirect = '/login';
+    } # else
+
+    $self->redirect_to( $redirect );
+};
+
+get '/logout' => sub {
+    my $self = shift;
+    $self->session( 'expires' => 1 );
+    my $redirect = $self->param('redirect') || '/';
+    $self->redirect_to( $redirect );
+}; # => 'logout';
+
+post '/preview' => sub {
+    my $self = shift;
+    my $text = $self->param('article') || return;
+    $self->render( 'text' => &markup( $text ) );
+};
+
+
+# Authentication
+ladder sub {
+    my $self = shift;
+
+    # Authenticated
+    return 1
+        if $self->session( 'login' );
+
+    # Not authenticated
+    $self->flash( 'message' => 'You are not logged in' );
+    $self->redirect_to( '/login' );
+    return;
+};
+
+any '/edit/:id' => [ id => qr/\d+/ ] => \&edit_article;
+
+# Other requests
+ladder sub { 1 };
+
+get '/profile/:login' => \&get_user;
+get '/(*title)'      => \&get_article;
+
+app->secret( 'microWiki' );
+app->start;
+
+END { my $rc = $dbh->disconnect }
+
+
+=head1 FUNCTIONS
+
+=head2 markup
+
+Convert lightweight markup into HTML
+
+=cut
+
+sub markup {
+    local $_ = shift || return;
+
+    return $txt->process( $_ );
+
+    # TODO: Links as in MediaWiki
+    s{
+        \[\[
+            (([^\]\|]+)\|)?
+             ([^\]\|]+)
+        \]\]
+        (
+            [^[[:space:]][[:punct:]] ]+
+        )?
+    }{
+        my $link  = $2 || $3;
+           $link  =~ tr/ /_/;
+        my $text  = $4;
+           $text .= $5 if $5;
+        sprintf q{"%s":/%s}, $text, $link
+    }gex;
+
+} # sub markup
+
+
+
+=head2 get_article
+
+Get article by title
+
+=cut
+
+sub get_article {
+    my $self  = shift;
+    my $title = $self->param('title');
+    $title =~ s/\.html$//;
+    $title =~ y/_/ /;
+
+    my $row = $dbh->selectrow_hashref(q{SELECT * FROM page WHERE title LIKE ?}, {}, $title);
+
+    $self->render_text(
+        markup( b( $row->{'text'} )->decode('UTF-8')->to_string ),
+        'title'  => b( $row->{'title'} )->decode('UTF-8')->to_string,
+        'layout' => 'default',
+        'id'     => $row->{'id'},
+    ) if $row;
+
+} # sub get_article
+
+
+=head2 edit_article
+
+Draw editing form and process it
+for article found by its all three parameters: year, topic and name.
+
+=cut
+
+sub edit_article {
+    my $self = shift;
+    my $id   = $self->param('id') || return;
+
+    if ( $self->req->method eq 'POST' ) {
+
+        # Validate
+        my $article_title   = $self->param('title');
+        my $article_content = $self->param('article');
+
+        my @errors = ();
+
+        TRY: {
+            # Is title present?
+            unless ( $article_title ) {
+                push ( @errors, 'Title can not be empty' );
+                last TRY;
+            }
+
+            # Is title unique?
+            if (
+                $dbh->selectrow_hashref(
+                    q{SELECT id FROM page WHERE title LIKE ? AND id != ?},
+                    {},
+                    $article_title, $id,
+                )
+            ) {
+                push ( @errors, 'Title must be unique' );
+                last TRY;
+            }
+
+        } # TRY
+
+        if ( @errors ) {
+            return $self->render(
+                'errors'            => [ @errors ],
+                'template'          => 'edit_article',
+                'title'             => 'Errors occured',
+                'id'                => $id,
+                'article_content'   => $article_content,
+                'article_title'     => $article_title,
+            );
+        } # if errors
+        # else OK
+
+        if (
+            $dbh->do(
+                q{UPDATE page SET title=?, text=? WHERE id=?},
+                {},
+                $article_title, $article_content, $id
+            )
+        ) {
+            $self->flash( 'message' => 'Changes was saved' );
+            $article_title =~ tr/ /_/;
+            $self->redirect_to( "/$article_title" );
+        }
+        # else NOT saved
+
+        push ( @errors, 'Can not save' );
+
+        return $self->render(
+            'errors'            => [ @errors ],
+            'template'          => 'edit_article',
+            'title'             => 'Errors occured',
+            'id'                => $id,
+            'article_content'   => $article_content,
+            'article_title'     => $article_title,
+        );
+
+    } # if POST
+
+    my $row = $dbh->selectrow_hashref(q{SELECT * FROM page WHERE id = ?}, {}, $id);
+
+    if ( $row ) {
+        return $self->render(
+            'template'          => 'edit_article',
+            'title'             => 'Editing',
+            'id'                => $id,
+            'article_content'   => b($row->{'text'} )->decode('UTF-8'),
+            'article_title'     => b($row->{'title'})->decode('UTF-8'),
+        );
+    } # if $row
+} # sub edit_article
+
+
+=head2 get_user
+
+Get user's profile
+
+=cut
+
+sub get_user {
+    my $self = shift;
+    my $login   = $self->param('login') || return;
+
+    my $row = $dbh->selectrow_hashref(
+        q{SELECT id FROM user WHERE login=?},
+        {},
+        $login,
+    );
+
+    if ( $row ) {
+        return $self->render(
+            'template'          => 'profile',
+            'login'              => $login,
+        );
+    } # if $row
+} # sub get_user
+
+__DATA__
+
+@@ login.html.ep
+% layout 'default';
+% stash 'title' => 'Login';
+<form method="post">
+<dl>
+<dt>Login</dt><dd><input type="text" name="login"></dd>
+<dt>Password</dt><dd><input type="password" name="password"></dd>
+</dl>
+<input type="submit" value="Login">
+</form>
+
+
+@@ not_found.html.ep
+% layout 'error';
+% stash 'title' => 'Not Found - ERROR 404';
+<h1>Not found</h1><p>Document you requested was not found.</p>
+
+
+@@ profile.html.ep
+% layout 'default';
+% stash 'title' => $login;
+<p>User was found</p>
+
+
+@@ default.html.ep
+% layout 'default';
+<h1><%= $title %></h1>
+Text
+
+@@ edit_article.html.ep
+% layout 'default';
+
+<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.1/jquery.min.js"></script>
+<script type="text/javascript">
+    $(document).ready(function() {
+
+        // Tie onclick action to all .ajax links
+        $('a#preview_link').click(function() {
+            $.ajax({
+                url:        '/preview',
+                type:       'post',
+                data:       { article: $('#article').val() },
+                dataType:   'html',
+                success:    function(data, textStatus) {
+                    $('div#preview_area').html(data);
+                    $('div#preview_area').show();
+                },
+                error:      function() {
+                    alert('Can not preview');
+                }
+            });
+            return false;
+        });
+    });
+</script>
+
+<h1>Change article</h1>
+
+<!--
+ if ( defined $errors ) {
+    <ul id="errors">
+   for my $error ( @$errors ) {
+        <li><$error></li>
+   }
+    </ul>
+ }
+-->
+
+<form method="post" action="/edit/<%= $id %>">
+<dl>
+<dt>Title</dt><dd><input type="text" name="title" value="<%= $article_title %>"></dd>
+<dt>Content</dt><dd><textarea name="article" id="article"><%= $article_content %></textarea></dd>
+</dl>
+<input type="submit" value="Save">
+<a href="#" id="preview_link">Preview</a>
+</form>
+<div id="preview_area"></div>
+
+
+@@ layouts/error.html.ep
+<!DOCTYPE html>
+<html>
+    <head>
+        <title><%= $title || 'ERROR' %></title>
+        <style type="text/css">body{background:#fec;color:#000}h1{color:#900}</style>
+    </head>
+    <body><%== content %>
+    <p>See also:</p><ul><li><a href="/">Main page</a></li><li><a href="/sitemap">Sitemap</a></li></ul>
+    </body>
+</html>
+
+
+
+@@ layouts/default.html.ep
+<!DOCTYPE html>
+<html>
+    <head><title><%= $title || 'Welcome' %></title>
+    <style type="text/css">
+        body {
+            margin:     0;
+            padding:    1em;
+            background: #fff;
+            color:      #000;
+            border:     1em solid #39c;
+        }
+
+        h1 {
+            color:      #335;
+        }
+
+        #message {
+            border:     1px solid #fc0;
+            background: #fec;
+            padding:    1em;
+        }
+
+        #logged {
+            float:      right;
+            display:    inline;
+            margin:     0;
+        }
+
+        #logged li {
+            display:    inline;
+            background: #eee;
+            border:     1px solid #ccc;
+            padding:    0.1em 0.5em;
+        }
+
+        dd textarea {
+            width:  100%;
+            height: 7em;
+        }
+
+        #preview_area {
+            border: 1px solid #900;
+            margin-top: 1em;
+            padding: 1em;
+            background: #eee;
+            display: none;
+        }
+
+        #preview_link {
+            color:      #656;
+            text-decoration: none;
+            border-bottom: 1px dashed #878;
+        }
+
+    </style>
+    </head>
+    <body>
+% if ( my $message = flash 'message' ) {
+        <div id="message"><%= $message %></div>
+% }
+
+% if ( my $login = session 'login' ) {
+        <ul id="logged">
+            <li>Logged as <a href="/profile/<%== $login %>"><%= $login %></a></li>
+            <li><a href="/logout">Logout</a></li>
+%            if ( my $id = stash 'id' ) {
+                <li><a href="/edit/<%== $id %>">Edit this page</a></li>
+%            }
+        </ul>
+% }
+    <h1><%= $title %></h1>
+    <%== content %>
+    </body>
+</html>
+
+
