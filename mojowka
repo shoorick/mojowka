@@ -291,26 +291,24 @@ __DATA__
 
 @@ login.html.ep
 % layout 'default';
+%# if ( my $login = session 'login' ) {
+%#     stash 'title' => 'You are already logged in';
+%# }
+%# else {
 % stash 'title' => 'Login';
 <form method="post">
 <dl>
-<dt>Login</dt><dd><input type="text" name="login"></dd>
+<dt>Username</dt><dd><input type="text" name="login"></dd>
 <dt>Password</dt><dd><input type="password" name="password"></dd>
 </dl>
 <input type="submit" value="Login">
 </form>
-
+%# } # else
 
 @@ not_found.html.ep
 % layout 'error';
 % stash 'title' => 'Not Found - ERROR 404';
 <h1>Not found</h1><p>Document you requested was not found.</p>
-
-
-@@ default.html.ep
-% layout 'default';
-<h1><%= $title %></h1>
-Text
 
 
 @@ edit_article.html.ep
@@ -452,16 +450,4 @@ Text
     <%== content %>
     </body>
 </html>
-
-
-@@ init.sql
-BEGIN TRANSACTION;
-CREATE TABLE "page" ("id" INTEGER PRIMARY KEY AUTOINCREMENT, "title" TEXT, "text" TEXT);
-INSERT INTO "page" VALUES(1,'Index','First page\n\nLightweight wiki *mojowka* based on top of "Mojolicious::Lite":http://search.cpan.org/dist/Mojolicious\n\n"Registered user":/login can change content of pages.');
-INSERT INTO "page" VALUES(2,'Sitemap','* "First page of site":/\n* "This page":/sitemap');
-CREATE TABLE "user" ("id" INTEGER PRIMARY KEY AUTOINCREMENT,"login" TEXT,"password" TEXT);
-INSERT INTO "user" VALUES(1,'admin','21232f297a57a5a743894a0e4a801fc3');
-CREATE UNIQUE INDEX "page_title" on page (title ASC);
-CREATE UNIQUE INDEX "user_login" on user (login ASC);
-COMMIT;
 
