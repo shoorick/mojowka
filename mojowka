@@ -31,7 +31,7 @@ our $txt = new Text::Textile;
 
 # Routes
 
-any '/' => sub { shift->redirect_to( '/index' ) };
+# any '/' => sub { shift->redirect_to( '/index' ) };
 
 # For security reasons User can login only via POST
 get  '/login' => 'login';
@@ -107,6 +107,7 @@ ladder sub { 1 };
 
 get '/profile/:login' => \&get_user;
 get '/(*title)'       => \&get_article;
+get '/'               => \&get_article;
 
 app->secret( 'microWiki' );
 app->start;
@@ -156,7 +157,7 @@ Get article by title
 
 sub get_article {
     my $self  = shift;
-    my $title = $self->param('title');
+    my $title = $self->param('title') || '';
     $title =~ s/\.html$//;
     $title =~ y/_/ /;
 
@@ -196,13 +197,7 @@ sub edit_article {
         my @errors = ();
 
         TRY: {
-            # Is title present?
-            unless ( $article_title ) {
-                push ( @errors, 'Title can not be empty' );
-                last TRY;
-            }
-
-            # Is title unique?
+            # is title non-unique?
             if (
                 $dbh->selectrow_hashref(
                     q{SELECT id FROM page WHERE title LIKE ? AND id != ?},
@@ -211,6 +206,12 @@ sub edit_article {
                 )
             ) {
                 push ( @errors, 'Title must be unique' );
+                last TRY;
+            } # if
+
+            # is content empty?
+            unless ( $article_content ) {
+                push ( @errors, 'Page content can not be empty' );
                 last TRY;
             }
 
@@ -268,12 +269,14 @@ sub edit_article {
         my $row = $dbh->selectrow_hashref(q{SELECT * FROM page WHERE id = ?}, {}, $id);
 
         if ( $row ) {
+            my $article_title = b($row->{'title'})->decode('UTF-8');
             return $self->render(
                 'template'          => 'edit_article',
                 'title'             => 'Editing',
                 'id'                => $id,
                 'article_content'   => b($row->{'text'} )->decode('UTF-8'),
-                'article_title'     => b($row->{'title'})->decode('UTF-8'),
+                'article_title'     => $article_title,
+                'old_title'         => $article_title,
             );
         } # if $row
     } # if $id
@@ -403,7 +406,7 @@ src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.1/jquery.min.js"></script>
 <input type="submit" value="Save">
 <a href="#" id="preview_link">Preview</a>
 % if ( my $old_title = stash 'old_title' ) {
-    <a href="/<%= $old_title %>">Cancel editing</a>
+    <a href="/<%= $old_title %>">Cancel</a>
 % }
 % if ( $id ) {
     <a href="/delete/<%= $id %>" id="delete_link"
@@ -420,10 +423,11 @@ src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.1/jquery.min.js"></script>
         <title><%= $title || 'ERROR' %></title>
         <style type="text/css">body{background:#fec;color:#000}h1{color:#900}</style>
     </head>
-    <body><%== content %>
+    <body>
+        <%== content %>
         <ul>
 % if ( session 'login' ) {
-        <li><a href="/edit/0?title=">Create page</a></li>
+        <li><a href="/edit/0">Create page</a></li>
 % }
         <li><a href="/">Main page</a></li>
         <li><a href="/sitemap">Sitemap</a></li>
@@ -432,11 +436,11 @@ src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.1/jquery.min.js"></script>
 </html>
 
 
-
 @@ layouts/default.html.ep
 <!DOCTYPE html>
 <html>
     <head><title><%= $title || 'Welcome' %></title>
+    <link rel="shortcut icon" href="/favicon.ico">
     <style type="text/css">
         body {
             margin:     0;

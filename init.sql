@@ -1,6 +1,6 @@
 BEGIN TRANSACTION;
 CREATE TABLE "page" ("id" INTEGER PRIMARY KEY AUTOINCREMENT, "title" TEXT, "text" TEXT);
-INSERT INTO "page" VALUES(1,'Index','First page
+INSERT INTO "page" VALUES(1,'','First page
 
 Lightweight wiki *mojowka* based on top of "Mojolicious::Lite":http://search.cpan.org/dist/Mojolicious
 
