@@ -99,13 +99,14 @@ ladder sub {
     return;
 };
 
-any '/edit/:id' => [ id => qr/\d+/ ] => \&edit_article;
+any '/edit/:id'   => [ id => qr/\d+/ ] => \&edit_article;
+any '/delete/:id' => [ id => qr/\d+/ ] => \&delete_article;
 
 # Other requests
 ladder sub { 1 };
 
 get '/profile/:login' => \&get_user;
-get '/(*title)'      => \&get_article;
+get '/(*title)'       => \&get_article;
 
 app->secret( 'microWiki' );
 app->start;
@@ -159,7 +160,11 @@ sub get_article {
     $title =~ s/\.html$//;
     $title =~ y/_/ /;
 
-    my $row = $dbh->selectrow_hashref(q{SELECT * FROM page WHERE title LIKE ?}, {}, $title);
+    my $row = $dbh->selectrow_hashref(
+        q{SELECT * FROM page WHERE title LIKE ?},
+        {},
+        $title,
+    );
 
     $self->render_text(
         markup( b( $row->{'text'} )->decode('UTF-8')->to_string ),
@@ -173,14 +178,14 @@ sub get_article {
 
 =head2 edit_article
 
-Draw editing form and process it
-for article found by its all three parameters: year, topic and name.
+Draw editing form for article found by its ID
+and process this form.
 
 =cut
 
 sub edit_article {
     my $self = shift;
-    my $id   = $self->param('id'); # digits only - 0 or natural number
+    my $id   = $self->param('id'); # digits only - 0 or natural number. See above
 
     my $article_title   = $self->param('title');
     my $article_content = $self->param('article');
@@ -283,6 +288,28 @@ sub edit_article {
 } # sub edit_article
 
 
+=head2 delete_article
+
+Delete article specified by ID
+
+=cut
+
+sub delete_article {
+    my $self = shift;
+    my $id   = $self->param('id') || return; # natural number only
+
+    my $rows_affected = $dbh->do(
+        q{DELETE FROM page WHERE id=?},
+        {},
+        $id,
+    );
+
+    if ( $rows_affected == 1 ) { # deleted without errors
+        $self->flash( 'message' => 'Page was deleted' );
+        $self->redirect_to( '/' );
+    } # if deleted
+} # sub delete_article
+
 =head2 get_user
 
 Get user's profile
@@ -333,7 +360,8 @@ __DATA__
 
 @@ edit_article.html.ep
 % layout 'default';
-<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.1/jquery.min.js"></script>
+<script type="text/javascript"
+src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.1/jquery.min.js"></script>
 <script type="text/javascript">
     $(document).ready(function() {
 
@@ -367,11 +395,20 @@ __DATA__
 
 <form method="post" action="/edit/<%= $id %>">
 <dl>
-<dt>Title</dt><dd><input type="text" name="title" value="<%= $article_title %>"></dd>
-<dt>Content</dt><dd><textarea name="article" id="article"><%= $article_content %></textarea></dd>
+<dt>Title</dt>
+<dd><input type="text" name="title" value="<%= $article_title %>"></dd>
+<dt>Content</dt>
+<dd><textarea name="article" id="article"><%= $article_content %></textarea></dd>
 </dl>
 <input type="submit" value="Save">
 <a href="#" id="preview_link">Preview</a>
+% if ( my $old_title = stash 'old_title' ) {
+    <a href="/<%= $old_title %>">Cancel editing</a>
+% }
+% if ( $id ) {
+    <a href="/delete/<%= $id %>" id="delete_link"
+    onclick="return confirm('Do you really want to delete this page?')">Delete page</a>
+% }
 </form>
 <div id="preview_area"></div>
 
@@ -454,6 +491,11 @@ __DATA__
             color:      #656;
             text-decoration: none;
             border-bottom: 1px dashed #878;
+        }
+
+        #delete_link {
+            color:      #900;
+            float:      right;
         }
 
     </style>
