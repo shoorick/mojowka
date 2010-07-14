@@ -23,7 +23,10 @@ use Text::Textile;
 use DBI;
 
 
-my $dbfile = 'data.sqlite';
+my $dbfile
+    = $ENV{'MOJOWKA_DATAFILE'}
+    || 'data.sqlite';
+
 our $dbh = DBI->connect("dbi:SQLite:dbname=$dbfile", '', '');
 
 our $txt = new Text::Textile;
