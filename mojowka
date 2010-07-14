@@ -424,7 +424,7 @@ src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.1/jquery.min.js"></script>
         <style type="text/css">body{background:#fec;color:#000}h1{color:#900}</style>
     </head>
     <body>
-        <%== content %>
+        <%= content %>
         <ul>
 % if ( session 'login' ) {
         <li><a href="/edit/0">Create page</a></li>
@@ -443,27 +443,46 @@ src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.1/jquery.min.js"></script>
     <link rel="shortcut icon" href="/favicon.ico">
     <style type="text/css">
         body {
-            margin:     0;
-            padding:    1em;
-            background: #fff;
-            color:      #000;
-            border:     1em solid #39c;
+                background: #fff;
+                color:      #000;
         }
 
-        h1 {
-            color:      #335;
+        h1, h2, h3, h4, h5, h6 {
+            font-family: sans-serif;
         }
 
-        #message {
-            border:     1px solid #fc0;
-            background: #fec;
-            padding:    1em;
-        }
+        @media screen {
+            body {
+                margin:     0;
+                padding:    1em;
+            }
 
-        #logged {
-            float:      right;
-            display:    inline;
-            margin:     0;
+            h1 {
+                color:      #223;
+                font-size:  140%;
+            }
+
+            h2 {
+                color:      #335;
+                font-size:  120%;
+            }
+
+            h3 {
+                color:      #446;
+                font-size:  100%;
+            }
+
+            #message {
+                border:     1px solid #fc0;
+                background: #fec;
+                padding:    1em;
+            }
+
+            #logged {
+                float:      right;
+                display:    inline;
+                margin:     0;
+            }
         }
 
         #logged li {
@@ -502,6 +521,16 @@ src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.1/jquery.min.js"></script>
             float:      right;
         }
 
+        @media print {
+            body {
+                font-family: serif;
+            }
+
+            #logged, #message {
+                display: none;
+            }
+        }
+
     </style>
     </head>
     <body>
@@ -511,15 +540,15 @@ src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.1/jquery.min.js"></script>
 
 % if ( my $login = session 'login' ) {
         <ul id="logged">
-            <li>Logged as <a href="/profile/<%== $login %>"><%= $login %></a></li>
+            <li>Logged as <a href="/profile/<%= $login %>"><%= $login %></a></li>
             <li><a href="/logout">Logout</a></li>
 %            if ( my $id = stash 'id' ) {
-                <li><a href="/edit/<%== $id %>">Edit this page</a></li>
+                <li><a href="/edit/<%= $id %>">Edit this page</a></li>
 %            }
         </ul>
 % }
     <h1><%= $title %></h1>
-    <%== content %>
+    <%= content %>
     </body>
 </html>
 
