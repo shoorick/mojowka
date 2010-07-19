@@ -91,7 +91,7 @@ get '/sitemap' => sub {
     my $self = shift;
 
     my $rows = $dbh->selectcol_arrayref(
-        q{SELECT title FROM page ORDER BY title},
+        q{SELECT title FROM page ORDER BY LOWER(title)},
     );
 
     return undef unless $rows;
@@ -182,9 +182,9 @@ sub get_article {
     $title =~ tr/_/ /;
 
     my $row = $dbh->selectrow_hashref(
-        q{SELECT * FROM page WHERE title LIKE ?},
+        q{SELECT * FROM page WHERE LOWER(title)=?},
         {},
-        $title,
+        lc $title,
     );
 
     $self->render_text(
@@ -224,9 +224,9 @@ sub edit_article {
             # is title non-unique?
             if (
                 $dbh->selectrow_hashref(
-                    q{SELECT id FROM page WHERE title LIKE ? AND id != ?},
+                    q{SELECT id FROM page WHERE LOWER(title)=? AND id!=?},
                     {},
-                    $article_title, $id,
+                    lc $article_title, $id,
                 )
             ) {
                 push ( @errors, 'Title must be unique' );
@@ -290,7 +290,7 @@ sub edit_article {
     } # if POST
 
     if ( $id ) { # existing record
-        my $row = $dbh->selectrow_hashref(q{SELECT * FROM page WHERE id = ?}, {}, $id);
+        my $row = $dbh->selectrow_hashref(q{SELECT * FROM page WHERE id=?}, {}, $id);
 
         if ( $row ) {
             my $article_title = b($row->{'title'})->decode('UTF-8');
