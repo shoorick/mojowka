@@ -106,6 +106,9 @@ get '/sitemap' => sub {
     );
 };
 
+get '/search/:query' => \&search;
+get '/search'        => \&search;
+
 
 # Authentication
 ladder sub {
@@ -182,9 +185,9 @@ sub get_article {
     $title =~ tr/_/ /;
 
     my $row = $dbh->selectrow_hashref(
-        q{SELECT * FROM page WHERE LOWER(title)=?},
+        q{SELECT * FROM page WHERE LOWER(title)=LOWER(?)},
         {},
-        lc $title,
+        $title,
     );
 
     $self->render_text(
@@ -224,9 +227,9 @@ sub edit_article {
             # is title non-unique?
             if (
                 $dbh->selectrow_hashref(
-                    q{SELECT id FROM page WHERE LOWER(title)=? AND id!=?},
+                    q{SELECT id FROM page WHERE LOWER(title)=LOWER(?) AND id!=?},
                     {},
-                    lc $article_title, $id,
+                    $article_title, $id,
                 )
             ) {
                 push ( @errors, 'Title must be unique' );
@@ -363,6 +366,57 @@ sub get_user {
 
 } # sub get_user
 
+
+=head2 search
+
+Search pages by title and content
+
+=cut
+
+sub search {
+    my $self = shift;
+
+    my $title = 'Search';
+    my $query = $self->param('query') || '';
+    my $rows  = [];
+
+    if ( $query ) {
+        my $row = $dbh->selectcol_arrayref(
+            q{SELECT title FROM page WHERE LOWER(title)=LOWER(?)},
+            {},
+            $query,
+        );
+        if ( @$row ) {
+            $self->flash( 'message' => 'Exact matching found' );
+            $query = b( shift @$row )->decode('UTF-8')->to_string;
+            $query =~ tr/ /_/;
+            $self->redirect_to( "/$query" );
+            return;
+        } # if row
+
+        $rows = $dbh->selectcol_arrayref(
+            q{SELECT title FROM page WHERE LOWER(title) LIKE LOWER(?) OR LOWER(text) LIKE LOWER(?) ORDER BY LOWER(title)},
+            {},
+            "%$query%", "%$query%",
+        );
+
+        # TODO Change to gettext based proper singular/plural form
+        $title = 'Found ' . scalar @$rows . ' results';
+
+        foreach my $row ( @$rows ) {
+            $row = b( $row )->decode('UTF-8')->to_string;
+        }
+
+    } # if query
+
+    return $self->render(
+        'template'         => 'search',
+        'query'            => $query,
+        'rows'             => $rows,
+        'title'            => $title,
+    );
+} # sub search
+
 __DATA__
 
 @@ login.html.ep
@@ -395,9 +449,27 @@ __DATA__
 </ul>
 <h2>Special pages</h2>
 <ul>
-<li><a href="/login">Login</a></li>
+<li><a href="/search">Search</a></li>
 <li><a href="/sitemap">Sitemap</a></li>
+<li><a href="/login">Login</a></li>
 </ul>
+
+
+@@ search.html.ep
+% layout 'default';
+<form action="/search">
+<input type="text" name="query" value="<%= $query %>">
+<input type="submit" value="Find">
+</dl>
+</form>
+<ol>
+% for my $row ( @$rows ) {
+%   my $link = $row;
+%   $link =~ tr/ /_/;
+%   $row  ||= 'Main page';
+    <li><a href="/<%= $link %>"><%= $row %></a></li>
+% }
+</ol>
 
 
 @@ not_found.html.ep
@@ -473,6 +545,7 @@ src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.1/jquery.min.js"></script>
         <ul>
 % if ( session 'login' ) {
 %       my $article_title = param 'title';
+        <li><a href="/search/<%= $article_title %>">Search for “<%= $article_title %>”</a></li>
         <li><a href="/create/<%= $article_title %>">Create page “<%= $article_title %>”</a></li>
 % }
         <li><a href="/">Main page</a></li>
