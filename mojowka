@@ -87,6 +87,25 @@ post '/preview' => sub {
     $self->render( 'text' => &markup( $text ) );
 };
 
+get '/sitemap' => sub {
+    my $self = shift;
+
+    my $rows = $dbh->selectcol_arrayref(
+        q{SELECT title FROM page ORDER BY title},
+    );
+
+    return undef unless $rows;
+
+    foreach my $row ( @$rows ) {
+        $row = b( $row )->decode('UTF-8')->to_string;
+    }
+
+    return $self->render(
+        'template'         => 'sitemap',
+        'rows'             => $rows,
+    );
+};
+
 
 # Authentication
 ladder sub {
@@ -361,6 +380,25 @@ __DATA__
 <input type="submit" value="Login">
 </form>
 %# } # else
+
+
+@@ sitemap.html.ep
+% layout 'default';
+% stash 'title' => 'Sitemap';
+<ul>
+% for my $row ( @$rows ) {
+%   my $link = $row;
+%   $link =~ tr/ /_/;
+%   $row  ||= 'Main page';
+    <li><a href="/<%= $link %>"><%= $row %></a></li>
+% }
+</ul>
+<h2>Special pages</h2>
+<ul>
+<li><a href="/login">Login</a></li>
+<li><a href="/sitemap">Sitemap</a></li>
+</ul>
+
 
 @@ not_found.html.ep
 % layout 'error';
