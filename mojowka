@@ -6,7 +6,7 @@ mojowka
 
 =head1 DESCRIPTION
 
-mojowka - is a lightweight wiki based on top of Mojolicious::Lite
+mojowka - is a L<Mojolicious::Lite> based lightweight wiki.
 
 =head1 AUTHOR
 
@@ -14,6 +14,11 @@ Alexander Sapozhnikov
 L<http://shoorick.ru/>
 L<< E<lt>shoorick@cpan.orgE<gt> >>
 2000-2010
+
+=head1 LICENSE
+
+This program is free software, you can redistribute it and/or modify
+it under the same terms as Perl itself.
 
 =cut
 
