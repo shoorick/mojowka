@@ -437,8 +437,7 @@ __DATA__
 
 
 @@ sitemap.html.ep
-% layout 'default';
-% stash 'title' => 'Sitemap';
+% layout 'default', 'title' => 'Sitemap';
 <ul>
 % for my $row ( @$rows ) {
 %   my $link = $row;
@@ -534,7 +533,7 @@ src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.1/jquery.min.js"></script>
 
 
 @@ layouts/error.html.ep
-<!DOCTYPE html>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
 <html>
     <head>
         <title><%= $title || 'ERROR' %></title>
@@ -543,20 +542,20 @@ src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.1/jquery.min.js"></script>
     <body>
         <%= content %>
         <ul>
-% if ( session 'login' ) {
-%       my $article_title = param 'title';
+% my $article_title = param 'title';
         <li><a href="/search/<%= $article_title %>">Search for “<%= $article_title %>”</a></li>
+        <li><a href="/sitemap">Sitemap</a></li>
+% if ( session 'login' ) {
         <li><a href="/create/<%= $article_title %>">Create page “<%= $article_title %>”</a></li>
 % }
         <li><a href="/">Main page</a></li>
-        <li><a href="/sitemap">Sitemap</a></li>
         </ul>
     </body>
 </html>
 
 
 @@ layouts/default.html.ep
-<!DOCTYPE html>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
 <html>
     <head><title><%= $title || 'Welcome' %></title>
     <link rel="shortcut icon" href="/favicon.ico">
