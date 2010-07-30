@@ -36,7 +36,7 @@ my $dbfile
 
 our $dbh = DBI->connect("dbi:SQLite:dbname=$dbfile", '', '');
 
-our $txt = new Text::Textile;
+our $txt = Text::Textile->new;
     $txt->charset('utf-8');
 
 # Routes
