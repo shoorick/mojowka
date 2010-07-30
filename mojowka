@@ -28,6 +28,8 @@ use Mojo::ByteStream 'b';
 use Text::Textile;
 use DBI;
 
+our $VERSION=0.01;
+
 my $dbfile
     = $ENV{'MOJOWKA_DATAFILE'}
     || 'data.sqlite';
