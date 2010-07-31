@@ -525,7 +525,9 @@ src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.1/jquery.min.js"></script>
 <dt>Title</dt>
 <dd><input type="text" name="title" value="<%= $article_title %>"></dd>
 <dt>Content</dt>
-<dd><textarea name="article" id="article"><%= $article_content %></textarea></dd>
+<dd><textarea name="article" id="article"><%= $article_content %></textarea>
+<br><a href="http://search.cpan.org/perldoc?Text::Textile#SYNTAX">textile syntax</a>
+</dd>
 </dl>
 <input type="submit" value="Save">
 <a href="#" id="preview_link">Preview</a>
