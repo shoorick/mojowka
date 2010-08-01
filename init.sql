@@ -7,8 +7,14 @@ Lightweight wiki *mojowka* based on top of "Mojolicious::Lite":http://search.cpa
 "Registered user":/login can change content of pages.');
 INSERT INTO "page" VALUES(2,'Sitemap','* "First page of site":/
 * "This page":/sitemap');
-CREATE TABLE "user" ("id" INTEGER PRIMARY KEY AUTOINCREMENT, "login" TEXT, "password" TEXT, "text" TEXT);
-INSERT INTO "user" VALUES(1,'admin','21232f297a57a5a743894a0e4a801fc3','Administrator of site. He can edit pages.');
+CREATE TABLE "user" (
+  "id" INTEGER PRIMARY KEY AUTOINCREMENT,
+  "login" TEXT,
+  "password" TEXT,
+  "text" TEXT,
+  "is_admin" BOOLEAN
+);
+INSERT INTO "user" VALUES(1,'admin','21232f297a57a5a743894a0e4a801fc3','Administrator of site. He can edit pages.',1);
 CREATE UNIQUE INDEX "page_title" on page (title ASC);
 CREATE UNIQUE INDEX "user_login" on user (login ASC);
 COMMIT;
