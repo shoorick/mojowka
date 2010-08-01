@@ -116,7 +116,6 @@ get '/sitemap' => sub {
 get '/search/:query' => \&search;
 get '/search'        => \&search;
 
-get '/userlist'       => \&get_userlist;
 
 # Authentication
 ladder sub { #same as under
@@ -138,6 +137,7 @@ any '/create/(*title)'                 => \&edit_article;
 
 any '/delete/:id' => [ id => qr/\d+/ ] => \&delete_article;
 
+get '/userlist'       => \&get_userlist;
 
 # Other requests
 ladder sub { 1 };
@@ -384,19 +384,25 @@ sub get_userlist {
     my $row = $dbh->selectrow_hashref(
         q{SELECT 1 FROM user WHERE login=? AND is_admin=1},
         {},
-        #$login,
+        $login,
     );
 
     if ($row) {
-        my $rows = $dbh->selectrow_hashref(
+        my $rows = $dbh->selectall_arrayref(
             q{SELECT login FROM user},
-            {},
+            { Slice => {} },
         );
-        return $self->render_text(
+        return $self->render(
             'rows' => $rows,
             'layout' => 'default',
             'template' => 'userlist',
         ) 
+    } else {
+        return $self->render_text(
+            markup( 'No rights for this' ),
+            'title'  => 'error',
+            'layout' => 'default',
+        );
     }
 
 }
@@ -456,7 +462,7 @@ __DATA__
 @@ userlist.html.ep
 % layout 'default', 'title' => 'User list';
 % foreach my $row (@$rows) {
-    <p><%= $login %></p>
+    <p><%= $row->{'login'} %></p>
 % }
 
 @@ login.html.ep
