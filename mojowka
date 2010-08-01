@@ -116,9 +116,10 @@ get '/sitemap' => sub {
 get '/search/:query' => \&search;
 get '/search'        => \&search;
 
+get '/userlist'       => \&get_userlist;
 
 # Authentication
-ladder sub {
+ladder sub { #same as under
     my $self = shift;
 
     # Authenticated
@@ -136,6 +137,7 @@ any '/edit/:id'   => [ id => 'new'   ] => \&edit_article;
 any '/create/(*title)'                 => \&edit_article;
 
 any '/delete/:id' => [ id => qr/\d+/ ] => \&delete_article;
+
 
 # Other requests
 ladder sub { 1 };
@@ -375,6 +377,30 @@ sub get_user {
 } # sub get_user
 
 
+sub get_userlist {
+    my $self = shift;
+    my $login   = $self->session( 'login' );
+
+    my $row = $dbh->selectrow_hashref(
+        q{SELECT 1 FROM user WHERE login=? AND is_admin=1},
+        {},
+        #$login,
+    );
+
+    if ($row) {
+        my $rows = $dbh->selectrow_hashref(
+            q{SELECT login FROM user},
+            {},
+        );
+        return $self->render_text(
+            'rows' => $rows,
+            'layout' => 'default',
+            'template' => 'userlist',
+        ) 
+    }
+
+}
+
 =head2 search
 
 Search pages by title and content
@@ -426,6 +452,12 @@ sub search {
 } # sub search
 
 __DATA__
+
+@@ userlist.html.ep
+% layout 'default', 'title' => 'User list';
+% foreach my $row (@$rows) {
+    <p><%= $login %></p>
+% }
 
 @@ login.html.ep
 % layout 'default';
