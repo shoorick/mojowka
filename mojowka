@@ -28,13 +28,15 @@ use Mojo::ByteStream 'b';
 use Text::Textile;
 use DBI;
 
+our $VERSION=0.01;
+
 my $dbfile
     = $ENV{'MOJOWKA_DATAFILE'}
     || 'data.sqlite';
 
 our $dbh = DBI->connect("dbi:SQLite:dbname=$dbfile", '', '');
 
-our $txt = new Text::Textile;
+our $txt = Text::Textile->new;
     $txt->charset('utf-8');
 
 # Routes
@@ -116,7 +118,7 @@ get '/search'        => \&search;
 
 
 # Authentication
-ladder sub {
+ladder sub { #same as under
     my $self = shift;
 
     # Authenticated
@@ -134,6 +136,8 @@ any '/edit/:id'   => [ id => 'new'   ] => \&edit_article;
 any '/create/(*title)'                 => \&edit_article;
 
 any '/delete/:id' => [ id => qr/\d+/ ] => \&delete_article;
+
+get '/userlist'       => \&get_userlist;
 
 # Other requests
 ladder sub { 1 };
@@ -373,6 +377,36 @@ sub get_user {
 } # sub get_user
 
 
+sub get_userlist {
+    my $self = shift;
+    my $login   = $self->session( 'login' );
+
+    my $row = $dbh->selectrow_hashref(
+        q{SELECT 1 FROM user WHERE login=? AND is_admin=1},
+        {},
+        $login,
+    );
+
+    if ($row) {
+        my $rows = $dbh->selectall_arrayref(
+            q{SELECT login FROM user},
+            { Slice => {} },
+        );
+        return $self->render(
+            'rows' => $rows,
+            'layout' => 'default',
+            'template' => 'userlist',
+        ) 
+    } else {
+        return $self->render_text(
+            markup( 'No rights for this' ),
+            'title'  => 'error',
+            'layout' => 'default',
+        );
+    }
+
+}
+
 =head2 search
 
 Search pages by title and content
@@ -424,6 +458,12 @@ sub search {
 } # sub search
 
 __DATA__
+
+@@ userlist.html.ep
+% layout 'default', 'title' => 'User list';
+% foreach my $row (@$rows) {
+    <p><%= $row->{'login'} %></p>
+% }
 
 @@ login.html.ep
 % layout 'default';
@@ -523,7 +563,9 @@ src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.1/jquery.min.js"></script>
 <dt>Title</dt>
 <dd><input type="text" name="title" value="<%= $article_title %>"></dd>
 <dt>Content</dt>
-<dd><textarea name="article" id="article"><%= $article_content %></textarea></dd>
+<dd><textarea name="article" id="article"><%= $article_content %></textarea>
+<br><a href="http://search.cpan.org/perldoc?Text::Textile#SYNTAX">textile syntax</a>
+</dd>
 </dl>
 <input type="submit" value="Save">
 <a href="#" id="preview_link">Preview</a>
