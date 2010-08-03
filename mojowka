@@ -376,10 +376,15 @@ sub get_user {
 
 } # sub get_user
 
+=head2 get_userlist
+
+Get list of registered users
+
+=cut
 
 sub get_userlist {
-    my $self = shift;
-    my $login   = $self->session( 'login' );
+    my $self  = shift;
+    my $login = $self->session( 'login' );
 
     my $row = $dbh->selectrow_hashref(
         q{SELECT 1 FROM user WHERE login=? AND is_admin=1},
@@ -393,19 +398,15 @@ sub get_userlist {
             { Slice => {} },
         );
         return $self->render(
-            'rows' => $rows,
-            'layout' => 'default',
+            'rows'     => $rows,
+            'layout'   => 'default',
             'template' => 'userlist',
         ) 
-    } else {
-        return $self->render_text(
-            markup( 'No rights for this' ),
-            'title'  => 'error',
-            'layout' => 'default',
-        );
     }
-
-}
+    # else
+    $self->flash( 'message' => 'Permission denied' );
+    $self->redirect_to( '/login' );
+} # sub get_userlist
 
 =head2 search
 
@@ -461,9 +462,11 @@ __DATA__
 
 @@ userlist.html.ep
 % layout 'default', 'title' => 'User list';
+<ul>
 % foreach my $row (@$rows) {
-    <p><%= $row->{'login'} %></p>
+    <li><%= $row->{'login'} %></li>
 % }
+</ul>
 
 @@ login.html.ep
 % layout 'default';
