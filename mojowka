@@ -591,15 +591,14 @@ src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.1/jquery.min.js"></script>
         <style type="text/css">body{background:#fec;color:#000}h1{color:#900}</style>
     </head>
     <body>
+%= include 'menu';
         <%= content %>
         <ul>
 % my $article_title = param 'title';
         <li><a href="/search/<%= $article_title %>">Search for “<%= $article_title %>”</a></li>
-        <li><a href="/sitemap">Sitemap</a></li>
 % if ( session 'login' ) {
         <li><a href="/create/<%= $article_title %>">Create page “<%= $article_title %>”</a></li>
 % }
-        <li><a href="/">Main page</a></li>
         </ul>
     </body>
 </html>
@@ -652,6 +651,24 @@ src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.1/jquery.min.js"></script>
                 display:    inline;
                 margin:     0;
             }
+
+            #menu {
+                list-style: none;
+                margin:     0;
+                padding:    0;
+                font-size:  80%;
+            }
+
+            #menu li {
+                display:    inline;
+                border-right: 2px solid #acd;
+                padding:    0 1em;
+            }
+
+            #menu form {
+                display:    inline;
+            }
+
         }
 
         #logged li {
@@ -695,7 +712,7 @@ src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.1/jquery.min.js"></script>
                 font-family: serif;
             }
 
-            #logged, #message {
+            #logged, #message, #menu {
                 display: none;
             }
         }
@@ -703,13 +720,15 @@ src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.1/jquery.min.js"></script>
     </style>
     </head>
     <body>
+%= include 'menu';
 % if ( my $message = flash 'message' ) {
         <div id="message"><%= $message %></div>
 % }
 
 % if ( my $login = session 'login' ) {
         <ul id="logged">
-            <li>Logged as <a href="/profile/<%= $login %>"><%= $login %></a></li>
+            <li>Logged as <a
+                href="/profile/<%= $login %>"><%= $login %></a></li>
             <li><a href="/logout">Logout</a></li>
 %            if ( my $id = stash 'id' ) {
                 <li><a href="/edit/<%= $id %>">Edit this page</a></li>
@@ -720,4 +739,10 @@ src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.1/jquery.min.js"></script>
     <%= content %>
     </body>
 </html>
+
+
+@@ menu.html.ep
+<ul id="menu"><li><a href="/">Main page</a></li><li><a
+    href="/sitemap">Sitemap</a></li><li><form
+    action="/search"><input type="text" name="query"></form></li></ul>
 
