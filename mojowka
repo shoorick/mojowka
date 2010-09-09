@@ -591,15 +591,14 @@ src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.1/jquery.min.js"></script>
         <style type="text/css">body{background:#fec;color:#000}h1{color:#900}</style>
     </head>
     <body>
+%= include 'menu';
         <%= content %>
         <ul>
 % my $article_title = param 'title';
         <li><a href="/search/<%= $article_title %>">Search for “<%= $article_title %>”</a></li>
-        <li><a href="/sitemap">Sitemap</a></li>
 % if ( session 'login' ) {
         <li><a href="/create/<%= $article_title %>">Create page “<%= $article_title %>”</a></li>
 % }
-        <li><a href="/">Main page</a></li>
         </ul>
     </body>
 </html>
@@ -610,106 +609,21 @@ src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.1/jquery.min.js"></script>
 <html>
     <head><title><%= $title || 'Welcome' %></title>
     <link rel="shortcut icon" href="/favicon.ico">
-    <style type="text/css">
-        body {
-                background: #fff;
-                color:      #000;
-        }
-
-        h1, h2, h3, h4, h5, h6 {
-            font-family: sans-serif;
-        }
-
-        @media screen {
-            body {
-                margin:     0;
-                padding:    1em;
-            }
-
-            h1 {
-                color:      #223;
-                font-size:  140%;
-            }
-
-            h2 {
-                color:      #335;
-                font-size:  120%;
-            }
-
-            h3 {
-                color:      #446;
-                font-size:  100%;
-            }
-
-            #message {
-                border:     1px solid #fc0;
-                background: #fec;
-                padding:    1em;
-            }
-
-            #logged {
-                float:      right;
-                display:    inline;
-                margin:     0;
-            }
-        }
-
-        #logged li {
-            display:    inline;
-            background: #eee;
-            border:     1px solid #ccc;
-            padding:    0.1em 0.5em;
-        }
-
-        #errors {
-            background: #fdc;
-            border:     1px solid #c00;
-        }
-
-        dd textarea {
-            width:  100%;
-            height: 7em;
-        }
-
-        #preview_area {
-            border: 1px solid #900;
-            margin-top: 1em;
-            padding: 1em;
-            background: #eee;
-            display: none;
-        }
-
-        #preview_link {
-            color:      #656;
-            text-decoration: none;
-            border-bottom: 1px dashed #878;
-        }
-
-        #delete_link {
-            color:      #900;
-            float:      right;
-        }
-
-        @media print {
-            body {
-                font-family: serif;
-            }
-
-            #logged, #message {
-                display: none;
-            }
-        }
-
-    </style>
+%# Maybe You can replace next line
+%# with <link rel="stylesheet" type="text/css" link="style.css">
+%# when you can inflate files. I can't :-(
+    <style type="text/css"><%= include 'style.css' %></style>
     </head>
     <body>
+%= include 'menu';
 % if ( my $message = flash 'message' ) {
         <div id="message"><%= $message %></div>
 % }
 
 % if ( my $login = session 'login' ) {
         <ul id="logged">
-            <li>Logged as <a href="/profile/<%= $login %>"><%= $login %></a></li>
+            <li>Logged as <a
+                href="/profile/<%= $login %>"><%= $login %></a></li>
             <li><a href="/logout">Logout</a></li>
 %            if ( my $id = stash 'id' ) {
                 <li><a href="/edit/<%= $id %>">Edit this page</a></li>
@@ -720,4 +634,133 @@ src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.1/jquery.min.js"></script>
     <%= content %>
     </body>
 </html>
+
+
+@@ menu.html.ep
+<ul id="menu"><li><a href="/">Main page</a></li><li><a
+    href="/sitemap">Sitemap</a></li><li><form
+    action="/search"><input type="text" name="query"></form></li></ul>
+
+@@ style.css.html.ep
+body {
+        background: #fff;
+        color:      #000;
+}
+
+h1, h2, h3, h4, h5, h6 {
+    font-family: sans-serif;
+}
+
+@media screen {
+    body {
+        margin:     0;
+        padding:    1em;
+    }
+
+    h1 {
+        color:      #223;
+        font-size:  140%;
+    }
+
+    h2 {
+        color:      #335;
+        font-size:  120%;
+    }
+
+    h3 {
+        color:      #446;
+        font-size:  100%;
+    }
+
+    #message {
+        border:     1px solid #fc0;
+        background: #fec;
+        padding:    1em;
+    }
+
+    #logged {
+        float:      right;
+        display:    inline;
+        margin:     0;
+    }
+
+    #menu {
+        list-style: none;
+        margin:     -1.25em -1.25em 1em;
+        padding:    0;
+        font-size:  80%;
+        background-color: #e0e7ee;
+    }
+
+    #menu li {
+        display:    inline;
+        padding:    0;
+    }
+
+    #menu a {
+        padding:    0.1em 2em;
+    }
+
+    #menu a:hover {
+        background-color: #8ab;
+        color:      #000;
+    }
+
+    #menu form {
+        display:    inline;
+        float:      right;
+    }
+
+    #menu input {
+    /*    background: url(public/bg-search.png) no-repeat right middle;*/
+    }
+
+}
+
+#logged li {
+    display:    inline;
+    background: #eee;
+    border:     1px solid #ccc;
+    padding:    0.1em 0.5em;
+}
+
+#errors {
+    background: #fdc;
+    border:     1px solid #c00;
+}
+
+dd textarea {
+    width:  100%;
+    height: 7em;
+}
+
+#preview_area {
+    border: 1px solid #900;
+    margin-top: 1em;
+    padding: 1em;
+    background: #eee;
+    display: none;
+}
+
+#preview_link {
+    color:      #656;
+    text-decoration: none;
+    border-bottom: 1px dashed #878;
+}
+
+#delete_link {
+    color:      #900;
+    float:      right;
+}
+
+@media print {
+    body {
+        font-family: serif;
+    }
+
+    #logged, #message, #menu {
+        display: none;
+    }
+}
+
 
