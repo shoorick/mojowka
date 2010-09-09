@@ -464,7 +464,7 @@ __DATA__
 % layout 'default', 'title' => 'User list';
 <ul>
 % foreach my $row (@$rows) {
-    <li><%= $row->{'login'} %></li>
+    <li><a href="/profile/<%= $row->{'login'} %>"><%= $row->{'login'} %></a></li>
 % }
 </ul>
 
