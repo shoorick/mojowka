@@ -139,6 +139,11 @@ any '/delete/:id' => [ id => qr/\d+/ ] => \&delete_article;
 
 get '/userlist'       => \&get_userlist;
 
+# Change password
+get  '/change_password/:id' => [ id => qr/\d+/ ] => 'change_password';
+get  '/change_password'     =>  'change_password';
+post '/change_password'     => \&change_password;
+
 # Other requests
 ladder sub { 1 };
 
@@ -458,6 +463,16 @@ sub search {
     );
 } # sub search
 
+
+=head2 change_password
+
+Change password of specified user
+
+=cut
+
+sub change_password {
+} # sub change_password
+
 __DATA__
 
 @@ userlist.html.ep
@@ -481,6 +496,20 @@ __DATA__
 <dt>Password</dt><dd><input type="password" name="password"></dd>
 </dl>
 <input type="submit" value="Login">
+</form>
+%# } # else
+
+
+@@ change_password.html.ep
+% layout 'default';
+% stash 'title' => 'Change password';
+<form method="post">
+<dl>
+<dt>Old Password</dt><dd><input type="password" name="old_password"></dd>
+<dt>New Password</dt><dd><input type="password" name="new_password"></dd>
+<dt>Repeat new password</dt><dd><input type="password" name="repeat_new_password"></dd>
+</dl>
+<input type="submit" value="Change">
 </form>
 %# } # else
 
