@@ -820,6 +820,7 @@ h1, h2, h3, h4, h5, h6 {
         list-style: none;
         margin:     -1.25em -1.25em 1em;
         padding:    0;
+        height:     2em;
         font-size:  80%;
         background-color: #e0e7ee;
     }
@@ -830,12 +831,16 @@ h1, h2, h3, h4, h5, h6 {
     }
 
     #menu a {
-        padding:    0.1em 2em;
+        padding:    0.3em 1em 0;
+        height:     1.7em;
+        display:    block;
+        float:      left;
     }
 
     #menu a:hover {
         background-color: #8ab;
         color:      #000;
+        text-decoration:        none;
     }
 
     #menu form {
@@ -844,7 +849,7 @@ h1, h2, h3, h4, h5, h6 {
     }
 
     #menu input {
-    /*    background: url(public/bg-search.png) no-repeat right middle;*/
+        background: url(/bg-search.png) no-repeat right middle;
     }
 
 }
