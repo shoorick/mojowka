@@ -577,6 +577,9 @@ __DATA__
             else if ( np.length < 8 ) {
                 strength = 'Too short password';
             }
+            else if ( np == '<%= session 'login' %>' ) {
+                strength = 'Password and login are equal';
+            }
             else if ( ! np.match(/\d/)  ) {
                 strength = 'Missing digits';
             }
