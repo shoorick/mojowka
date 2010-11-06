@@ -39,6 +39,9 @@ our $dbh = DBI->connect("dbi:SQLite:dbname=$dbfile", '', '');
 our $txt = Text::Textile->new;
     $txt->charset('utf-8');
 
+# my $JQUERY_URL = '/jquery-1.4.2.min.js';
+# http://ajax.googleapis.com/ajax/libs/jquery/1.4.1/jquery.min.js
+
 # Routes
 
 # any '/' => sub { shift->redirect_to( '/index' ) };
@@ -471,6 +474,51 @@ Change password of specified user
 =cut
 
 sub change_password {
+    my $self = shift;
+    my $login = $self->session( 'login' );
+    my $redirect = '/change_password'; # Default redirect - to form
+
+    my $old_password        = $self->param( 'old_password' )        || '';
+    my $new_password        = $self->param( 'new_password' )        || '';
+    my $repeat_new_password = $self->param( 'repeat_new_password' ) || '';
+
+    if ( $new_password ne $repeat_new_password ) {
+        $self->flash( 'message' => 'Passwords does not match' );
+        $self->redirect_to( $redirect );
+        return;
+    }
+
+    # else
+    # Check old password
+    my $row = $dbh->selectrow_hashref(
+        q{SELECT id FROM user WHERE login=? AND password=?},
+        {},
+        $login, b($old_password)->md5_sum
+    );
+
+    # Wrong old password
+    unless ( $row ) {
+        $self->flash( 'message' => 'Wrong old password' );
+        $self->redirect_to( $redirect );
+        return;
+    }
+
+    my $rows_affected = $dbh->do(
+        q{UPDATE user SET password=? WHERE id=?},
+        {},
+        b($new_password)->md5_sum, $row->{'id'},
+    );
+    
+    if ( $rows_affected ) {
+        $self->flash( 'message' => 'Password was changed' );
+        $redirect = "/profile/$login";
+    }
+    else {
+        $self->flash( 'message' => 'Can not change password' );
+    }
+
+    $self->redirect_to( $redirect );
+
 } # sub change_password
 
 __DATA__
@@ -502,12 +550,64 @@ __DATA__
 
 @@ change_password.html.ep
 % layout 'default';
+<script type="text/javascript" src="/jquery-1.4.2.min.js"></script>
+<script type="text/javascript">
+    function compare_passwords(){
+        if ( $('#new_password').val() == $('#repeat_new_password').val() ) {
+            $('#matching').html( '' );
+            return true;
+        }
+        $('#matching').html( 'Passwords does not match' );
+        return false;
+    }
+
+    $(document).ready(function() {
+
+        // Check strength and matching
+        $('#new_password').change(function() {
+            compare_passwords();
+            // Strong password must be at least 8 characters long
+            // and must contain letters in other cases, digits and punctuation signs
+            var np = $('#new_password').val();
+            var strength = 'Strong password';
+
+            if ( np.length == 0 ) {
+                strength = 'Empty password';
+            }
+            else if ( np.length < 8 ) {
+                strength = 'Too short password';
+            }
+            else if ( ! np.match(/\d/)  ) {
+                strength = 'Missing digits';
+            }
+            else if ( ! np.match(/[a-z]/)  ) {
+                strength = 'Missing small letters';
+            }
+            else if ( ! np.match(/[A-Z]/)  ) {
+                strength = 'Missing capital letters';
+            }
+            $('#strength').html( strength );
+        });
+
+        // Only check matching when change last field
+        $('#repeat_new_password').change(function() {
+            compare_passwords();
+        });
+
+        // Prevent sending wrong data
+        $('#password_form').submit(function() {
+            return compare_passwords();
+        });
+    });
+</script>
 % stash 'title' => 'Change password';
-<form method="post">
+<form method="post" id="password_form">
 <dl>
 <dt>Old Password</dt><dd><input type="password" name="old_password"></dd>
-<dt>New Password</dt><dd><input type="password" name="new_password"></dd>
-<dt>Repeat new password</dt><dd><input type="password" name="repeat_new_password"></dd>
+<dt>New Password</dt><dd><input type="password" name="new_password" id="new_password">
+<em class="tip" id="strength"></em></dd>
+<dt>Repeat new password</dt><dd><input type="password" name="repeat_new_password" id="repeat_new_password">
+<em class="tip" id="matching"></em></dd>
 </dl>
 <input type="submit" value="Change">
 </form>
@@ -557,8 +657,7 @@ __DATA__
 
 @@ edit_article.html.ep
 % layout 'default';
-<script type="text/javascript"
-src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.1/jquery.min.js"></script>
+<script type="text/javascript" src="/jquery-1.4.2.min.js"></script>
 <script type="text/javascript">
     $(document).ready(function() {
 
@@ -653,6 +752,7 @@ src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.1/jquery.min.js"></script>
         <ul id="logged">
             <li>Logged as <a
                 href="/profile/<%= $login %>"><%= $login %></a></li>
+            <li><a href="/change_password">Change password</a></li>
             <li><a href="/logout">Logout</a></li>
 %            if ( my $id = stash 'id' ) {
                 <li><a href="/edit/<%= $id %>">Edit this page</a></li>
@@ -672,8 +772,8 @@ src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.1/jquery.min.js"></script>
 
 @@ style.css.html.ep
 body {
-        background: #fff;
-        color:      #000;
+    background: #fff;
+    color:      #000;
 }
 
 h1, h2, h3, h4, h5, h6 {
