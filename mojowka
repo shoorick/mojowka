@@ -24,6 +24,7 @@ it under the same terms as Perl itself.
 
 use utf8;
 use Mojolicious::Lite;
+no warnings 'redefine';
 
 use DBI;
 use File::Basename 'basename';
