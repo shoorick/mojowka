@@ -662,12 +662,29 @@ __DATA__
 % layout 'error';
 % stash 'title' => 'Not Found - ERROR 404';
 <h1>Not found</h1><p>Document you requested was not found.</p>
+<ul>
+% my $article_title = param 'title';
+<li><a href="/search/<%= $article_title %>">Search for “<%= $article_title %>”</a></li>
+% if ( session 'login' ) {
+<li><a href="/create/<%= $article_title %>">Create page “<%= $article_title %>”</a></li>
+% }
+</ul>
 
 
 @@ image_not_found.html.ep
 % layout 'error';
 % stash 'title' => 'Not Found - ERROR 404';
 <h1>Not found</h1><p>Image you requested was not found.</p>
+<ul>
+% my $article_title = param 'title';
+<li><a href="/search/<%= $article_title %>">Search for “<%= $article_title %>”</a></li>
+% if ( session 'login' ) {
+<li><form action="/images/<%= $article_title %>" method="post">Choose an image
+<input type="file" name="file"> and 
+<input type="submit" value="Upload"></form></li>
+<input type="hidden" name="name" value="<%== $article_title %>">
+% }
+</ul>
 
 
 @@ edit_article.html.ep
@@ -736,13 +753,6 @@ __DATA__
     <body>
 %= include 'menu';
         <%= content %>
-        <ul>
-% my $article_title = param 'title';
-        <li><a href="/search/<%= $article_title %>">Search for “<%= $article_title %>”</a></li>
-% if ( session 'login' ) {
-        <li><a href="/create/<%= $article_title %>">Create page “<%= $article_title %>”</a></li>
-% }
-        </ul>
     </body>
 </html>
 
