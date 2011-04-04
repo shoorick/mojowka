@@ -14,14 +14,22 @@ Usage:
     ./mojowka COMMAND [OPTIONS]
     Example:
     ./mojowka daemon --reload
+        # spawn server
+    ./mojowka help
+        # get list of available commands
 
-When COMMAND and OPTIONS are omitted list of available commands will be shown.
+When COMMAND and OPTIONS are omitted then server will be spawned
+(./mojowka is equivalent to ./mojowka daemon).
 
 Before first run you must create database:
     sqlite3 data.sqlite < init.sql
 
-Registered users can change content of pages.
+Registered users can change content of pages and upload images.
 There's one user: admin with same password.
+
+Go to http://127.0.0.1:3000/desired_page for creating new page
+and to http://127.0.0.1:3000/images/desired_image for uploading.
+
 
 Alexander Sapozhnikov
 http://shoorick.ru/
