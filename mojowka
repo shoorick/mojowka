@@ -156,7 +156,7 @@ get '/'               => \&get_article;
 
 app->types->type( 'html' => 'text/html; charset=utf-8' );
 app->secret( 'mojowka' );
-app->start;
+app->start( @ARGV ? @ARGV : 'daemon' );
 
 END { my $rc = $dbh->disconnect }
 
