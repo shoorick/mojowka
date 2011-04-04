@@ -13,7 +13,7 @@ mojowka - is a L<Mojolicious::Lite> based lightweight wiki.
 Alexander Sapozhnikov
 L<http://shoorick.ru/>
 L<< E<lt>shoorick@cpan.orgE<gt> >>
-2000-2010
+2000-2011
 
 =head1 LICENSE
 
@@ -24,11 +24,14 @@ it under the same terms as Perl itself.
 
 use utf8;
 use Mojolicious::Lite;
+
+use DBI;
+use File::Basename 'basename';
+use File::Path     'mkpath';
 use Mojo::ByteStream 'b';
 use Text::Textile;
-use DBI;
 
-our $VERSION=0.01;
+our $VERSION=0.02;
 
 my $dbfile
     = $ENV{'MOJOWKA_DATAFILE'}
@@ -38,6 +41,18 @@ our $dbh = DBI->connect("dbi:SQLite:dbname=$dbfile", '', '');
 
 our $txt = Text::Textile->new;
     $txt->charset('utf-8');
+
+# Image base URL
+our $IMAGE_BASE
+    = $ENV{'MOJOWKA_IMAGE_BASE'}
+    || '/images';
+
+# Directory to save image files
+# http://d.hatena.ne.jp/yukikimoto/20100212/1265989676
+my $IMAGE_DIR  = app->static->root . $IMAGE_BASE;
+unless (-d $IMAGE_DIR) {
+    mkpath $IMAGE_DIR or die "Cannot create directory: $IMAGE_DIR";
+}
 
 # my $JQUERY_URL = '/jquery-1.4.2.min.js';
 # http://ajax.googleapis.com/ajax/libs/jquery/1.4.1/jquery.min.js
@@ -49,7 +64,7 @@ our $txt = Text::Textile->new;
 # For security reasons User can login only via POST
 get  '/login' => 'login';
 post '/login' => sub {
-    my $self = shift;
+    my $self  = shift;
     my $login    = $self->param('login')    || '';
 
     my $password = $self->param('password') || '';
@@ -137,6 +152,8 @@ ladder sub { #same as under
 any '/edit/:id'   => [ id => qr/\d+/ ] => \&edit_article;
 any '/edit/:id'   => [ id => 'new'   ] => \&edit_article;
 any '/create/(*title)'                 => \&edit_article;
+
+post '/images/(*title)'                => \&upload_image;
 
 any '/delete/:id' => [ id => qr/\d+/ ] => \&delete_article;
 
@@ -527,6 +544,74 @@ sub change_password {
 
 } # sub change_password
 
+=head2  upload_image
+
+Upload image file.
+See L<http://d.hatena.ne.jp/yukikimoto/20100212/1265989676> for more details. 
+
+=cut
+
+sub upload_image {
+    my $self  = shift;
+    my $title = $self->param('title') || time;
+       $title =~ s/\.\w{3,4}$//i; # Trim extension when presented. Images have 3 or 4 letter extension
+
+    my $image = $self->req->upload('file');
+    
+    # Nothing uploaded
+    return $self->render(
+        'template' => 'error',
+        'title'    => 'Upload failed',
+        'errors'   => [ 'File is not specified.' ],
+    )
+        unless $image;
+    
+    # Skip oversized
+    return $self->render(
+        'template' => 'error',
+        'title'    => 'Upload failed',
+        'errors'   => [ 'Image size is too large.' ],
+    )
+        if $ENV{MOJO_MAX_MESSAGE_SIZE}
+        && $ENV{MOJO_MAX_MESSAGE_SIZE} < $image->size;
+    
+    
+    # Check file type
+    my %exts = ( 'image/gif' => 'gif', 'image/jpeg' => 'jpg', 'image/png' => 'png' );
+    my $image_type  = $image->headers->content_type;
+    
+    # Extention
+    my $ext = $exts{$image_type}
+        or
+        # Content type is wrong
+        return $self->render(
+            template => 'error',
+            message  => "Upload fail. Content type is wrong."
+        );
+    
+    
+    # Image file
+    my $image_file = "$IMAGE_DIR/$title.$ext";
+    
+    # If file is exists, Retry creating filename
+    my $i = 0;
+    $image_file = "$IMAGE_DIR/$title." . $i++ . ".$ext"
+        while -f $image_file;
+
+    my $image_link = substr( $image_file, length app->static->root );
+
+
+    # Save to file
+    $image->move_to($image_file);
+    
+    $self->render(
+        'title'    => 'Image uploaded',
+        'link'     => $image_link,
+        'template' => 'upload_image',
+    );
+    
+} # sub upload_image
+
 __DATA__
 
 @@ userlist.html.ep
@@ -658,6 +743,14 @@ __DATA__
 </ol>
 
 
+@@ upload_image.html.ep
+% layout 'default';
+<p>Image uploaded as <a href="<%= $link %>"><%= $link %></a>:
+<br><img src="<%= $link %>" alt="Just uploaded"></p>
+<p>You can insert this image to pages with following code:</p>
+<blockquote><code>!<%= $link %>!</code></blockquote>
+
+
 @@ not_found.html.ep
 % layout 'error';
 % stash 'title' => 'Not Found - ERROR 404';
@@ -679,10 +772,9 @@ __DATA__
 % my $article_title = param 'title';
 <li><a href="/search/<%= $article_title %>">Search for “<%= $article_title %>”</a></li>
 % if ( session 'login' ) {
-<li><form action="/images/<%= $article_title %>" method="post">Choose an image
+<li><form action="/images/<%= $article_title %>" method="post" enctype ="multipart/form-data">Choose an image
 <input type="file" name="file"> and 
 <input type="submit" value="Upload"></form></li>
-<input type="hidden" name="name" value="<%== $article_title %>">
 % }
 </ul>
 
