@@ -150,6 +150,8 @@ post '/change_password'     => \&change_password;
 # Other requests
 ladder sub { 1 };
 
+get '/images/(*title)' => 'image_not_found';
+
 get '/profile/:login' => \&get_user;
 get '/(*title)'       => \&get_article;
 get '/'               => \&get_article;
@@ -208,12 +210,16 @@ sub get_article {
         $title,
     );
 
+    return $self->render(
+        'template' => 'not_found',
+    ) unless $row;
+
     $self->render_text(
         markup( b( $row->{'text'} )->decode('UTF-8')->to_string ),
         'title'  => b( $row->{'title'} )->decode('UTF-8')->to_string,
         'layout' => 'default',
         'id'     => $row->{'id'},
-    ) if $row;
+    );
 
 } # sub get_article
 
@@ -656,6 +662,12 @@ __DATA__
 % layout 'error';
 % stash 'title' => 'Not Found - ERROR 404';
 <h1>Not found</h1><p>Document you requested was not found.</p>
+
+
+@@ image_not_found.html.ep
+% layout 'error';
+% stash 'title' => 'Not Found - ERROR 404';
+<h1>Not found</h1><p>Image you requested was not found.</p>
 
 
 @@ edit_article.html.ep
