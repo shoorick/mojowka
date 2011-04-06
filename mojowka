@@ -815,11 +815,13 @@ __DATA__
 			handles: 's'
 		});
 
-        $('a#btn_bold').click(function(){ wrap('*', '*') });
-        $('a#btn_italic').click(function(){ wrap('_', '_') });
-        $('a#btn_h1').click(function(){ wrap('\n\nh1. ', '\n\n') });
-        $('a#btn_h2').click(function(){ wrap('\n\nh2. ', '\n\n') });
-        $('a#btn_h3').click(function(){ wrap('\n\nh3. ', '\n\n') });
+        $('#btn_bold').click(function(){ wrap('*', '*') });
+        $('#btn_italic').click(function(){ wrap('_', '_') });
+        $('#btn_h1').click(function(){ wrap('\n\nh1. ', '\n\n') });
+        $('#btn_h2').click(function(){ wrap('\n\nh2. ', '\n\n') });
+        $('#btn_h3').click(function(){ wrap('\n\nh3. ', '\n\n') });
+        $('#btn_ul').click(function(){ wrap('\n\n* ', '\n\n') });
+        $('#btn_ol').click(function(){ wrap('\n\n# ', '\n\n') });
 
     });
 </script>
@@ -829,6 +831,14 @@ __DATA__
 .ui-resizable-disabled .ui-resizable-handle, .ui-resizable-autohide .ui-resizable-handle { display: none; }
 .ui-resizable-s { cursor: s-resize; height: 20px; width: 100%; bottom: 11px; left: 0;background:url(/grip.gif) no-repeat right top;margin:0 -4px }
 #toolbar a { margin: 0 2px; padding: 0 0.3em; border: 1px outset #999; text-decoration:none; color: #000 }
+button { background:url(/toolbar.gif) no-repeat 0 50%;width:22px;height:22px;text-indent:-9999em;border:1px outset #999;-moz-border-radius:2px;border-radius:3px}
+button:hover{border-color:#69c}
+#btn_italic { background-position:  -20px 50% }
+#btn_h1 { background-position:  -40px 50% }
+#btn_h2 { background-position:  -60px 50% }
+#btn_h3 { background-position:  -80px 50% }
+#btn_ul { background-position: -100px 50% }
+#btn_ol { background-position: -120px 50% }
 </style>
 
 % if ( my $errors = stash 'errors' ) {
@@ -845,11 +855,13 @@ __DATA__
 <dd><input type="text" name="title" value="<%= $article_title %>"></dd>
 <dt>Content</dt>
 <dd><span id="toolbar">
-<a href="#" id="btn_bold" title="Bold" style="font-weight:bold">B</a>
-<a href="#" id="btn_italic" title="Italic" style="font-style:italic">I</a>
-<a href="#" id="btn_h1" title="Header 1">H1</a>
-<a href="#" id="btn_h2" title="Header 2">H2</a>
-<a href="#" id="btn_h3" title="Header 3">H3</a>
+<button type="button" id="btn_bold" title="Bold">Bold</button>
+<button type="button" id="btn_italic" title="Italic">Italic</button>
+<button type="button" id="btn_h1" title="Header 1">Header 1</button>
+<button type="button" id="btn_h2" title="Header 2">Header 2</button>
+<button type="button" id="btn_h3" title="Header 3">Header 3</button>
+<button type="button" id="btn_ul" title="Unordered list item">Unordered list item</button>
+<button type="button" id="btn_ol" title="Ordered list item">Ordered list item</button>
 </span>
 <br><textarea name="article" id="article"><%= $article_content %></textarea>
 <br><a href="http://search.cpan.org/perldoc?Text::Textile#SYNTAX">textile syntax</a>
