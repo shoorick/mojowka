@@ -55,7 +55,7 @@ unless (-d $IMAGE_DIR) {
     mkpath $IMAGE_DIR or die "Cannot create directory: $IMAGE_DIR";
 }
 
-# my $JQUERY_URL = '/jquery-1.4.2.min.js';
+# my $JQUERY_URL = '/jquery-1.5.1.min.js';
 # http://ajax.googleapis.com/ajax/libs/jquery/1.4.1/jquery.min.js
 
 # Routes
@@ -642,7 +642,7 @@ __DATA__
 
 @@ change_password.html.ep
 % layout 'default';
-<script type="text/javascript" src="/jquery-1.4.2.min.js"></script>
+<script type="text/javascript" src="/jquery-1.5.1.min.js"></script>
 <script type="text/javascript">
     function compare_passwords(){
         if ( $('#new_password').val() == $('#repeat_new_password').val() ) {
@@ -782,7 +782,7 @@ __DATA__
 
 @@ edit_article.html.ep
 % layout 'default';
-<script type="text/javascript" src="/jquery-1.4.2.min.js"></script>
+<script type="text/javascript" src="/jquery-1.5.1.min.js"></script>
 <script type="text/javascript">
     $(document).ready(function() {
 
