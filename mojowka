@@ -784,7 +784,14 @@ __DATA__
 % layout 'default';
 <script type="text/javascript" src="/jquery-1.5.1.min.js"></script>
 <script type="text/javascript" src="/jquery-ui-1.8.11.custom.min.js"></script>
+<script type="text/javascript" src="/jquery-fieldselection.min.js"></script>
 <script type="text/javascript">
+    function wrap(prefix, suffix) {
+        $('#article').wrapSelection(prefix, suffix);
+        $('#article').focus();
+        return false;
+    }
+
     $(document).ready(function() {
 
         // Tie onclick action to all .ajax links
@@ -807,6 +814,13 @@ __DATA__
         $('#article').resizable({
 			handles: 's'
 		});
+
+        $('a#btn_bold').click(function(){ wrap('*', '*') });
+        $('a#btn_italic').click(function(){ wrap('_', '_') });
+        $('a#btn_h1').click(function(){ wrap('\n\nh1. ', '\n\n') });
+        $('a#btn_h2').click(function(){ wrap('\n\nh2. ', '\n\n') });
+        $('a#btn_h3').click(function(){ wrap('\n\nh3. ', '\n\n') });
+
     });
 </script>
 <style type="text/css">
@@ -814,6 +828,7 @@ __DATA__
 .ui-resizable-handle { position: absolute;font-size: 0.1px;z-index: 99999; display: block;}
 .ui-resizable-disabled .ui-resizable-handle, .ui-resizable-autohide .ui-resizable-handle { display: none; }
 .ui-resizable-s { cursor: s-resize; height: 20px; width: 100%; bottom: 11px; left: 0;background:url(/grip.gif) no-repeat right top;margin:0 -4px }
+#toolbar a { margin: 0 2px; padding: 0 0.3em; border: 1px outset #999; text-decoration:none; color: #000 }
 </style>
 
 % if ( my $errors = stash 'errors' ) {
@@ -829,7 +844,14 @@ __DATA__
 <dt>Title</dt>
 <dd><input type="text" name="title" value="<%= $article_title %>"></dd>
 <dt>Content</dt>
-<dd><textarea name="article" id="article"><%= $article_content %></textarea>
+<dd><span id="toolbar">
+<a href="#" id="btn_bold" title="Bold" style="font-weight:bold">B</a>
+<a href="#" id="btn_italic" title="Italic" style="font-style:italic">I</a>
+<a href="#" id="btn_h1" title="Header 1">H1</a>
+<a href="#" id="btn_h2" title="Header 2">H2</a>
+<a href="#" id="btn_h3" title="Header 3">H3</a>
+</span>
+<br><textarea name="article" id="article"><%= $article_content %></textarea>
 <br><a href="http://search.cpan.org/perldoc?Text::Textile#SYNTAX">textile syntax</a>
 </dd>
 </dl>
