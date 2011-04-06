@@ -783,6 +783,7 @@ __DATA__
 @@ edit_article.html.ep
 % layout 'default';
 <script type="text/javascript" src="/jquery-1.5.1.min.js"></script>
+<script type="text/javascript" src="/jquery-ui-1.8.11.custom.min.js"></script>
 <script type="text/javascript">
     $(document).ready(function() {
 
@@ -803,8 +804,17 @@ __DATA__
             });
             return false;
         });
+        $('#article').resizable({
+			handles: 's'
+		});
     });
 </script>
+<style type="text/css">
+.ui-resizable { position: relative}
+.ui-resizable-handle { position: absolute;font-size: 0.1px;z-index: 99999; display: block;}
+.ui-resizable-disabled .ui-resizable-handle, .ui-resizable-autohide .ui-resizable-handle { display: none; }
+.ui-resizable-s { cursor: s-resize; height: 20px; width: 100%; bottom: 11px; left: 0;background:url(/grip.gif) no-repeat right top;margin:0 -4px }
+</style>
 
 % if ( my $errors = stash 'errors' ) {
     <ul id="errors">
@@ -964,7 +974,9 @@ h1, h2, h3, h4, h5, h6 {
     }
 
     #menu input {
-        background: url(/bg-search.png) no-repeat right middle;
+        background: #fff url(/bg-search.png) no-repeat 100% 50%;
+        color: #333;
+        font-family: 'DejaVu Sans Mono','Liberation Mono',monospaced;
     }
 
 }
