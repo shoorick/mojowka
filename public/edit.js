@@ -1,6 +1,11 @@
 function wrap(prefix, suffix) {
-    $('#article').wrapSelection(prefix, suffix);
-    $('#article').focus();
+    with ( $('#article') ) {
+        var inner = caret().text;
+        var start = caret().start;
+        var end   = caret().end;
+        val( caret().replace( prefix + inner + suffix ) );
+        caret({ start: start+prefix.length, end:end+prefix.length });
+    }
     return false;
 }
 
@@ -24,8 +29,8 @@ $(document).ready(function() {
         return false;
     });
     $('#article').resizable({
-                    handles: 's'
-            });
+        handles: 's'
+    });
 
     $('#btn_bold').click(function(){ wrap('*', '*') });
     $('#btn_italic').click(function(){ wrap('_', '_') });
