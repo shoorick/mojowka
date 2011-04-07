@@ -39,5 +39,10 @@ $(document).ready(function() {
     $('#btn_h3').click(function(){ wrap('\n\nh3. ', '\n\n') });
     $('#btn_ul').click(function(){ wrap('\n\n* ', '\n\n') });
     $('#btn_ol').click(function(){ wrap('\n\n# ', '\n\n') });
-
+    $('#article').keypress(function(e){
+        switch (e.which) {
+            case 2: wrap('*', '*'); break;
+            case 9: wrap('_', '_'); break;
+        }
+    });
 });

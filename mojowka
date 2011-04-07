@@ -816,8 +816,8 @@ button:hover{border-color:#69c}
 <dd><input type="text" name="title" value="<%= $article_title %>"></dd>
 <dt>Content</dt>
 <dd><span id="toolbar">
-<button type="button" id="btn_bold" title="Bold">Bold</button>
-<button type="button" id="btn_italic" title="Italic">Italic</button>
+<button type="button" id="btn_bold" title="Bold (Ctrl+B)">Bold</button>
+<button type="button" id="btn_italic" title="Italic (Ctrl+I)">Italic</button>
 <button type="button" id="btn_h1" title="Header 1">Header 1</button>
 <button type="button" id="btn_h2" title="Header 2">Header 2</button>
 <button type="button" id="btn_h3" title="Header 3">Header 3</button>
