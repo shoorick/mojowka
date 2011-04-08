@@ -146,7 +146,10 @@ ladder sub { #same as under
 
     # Not authenticated
     $self->flash( 'message' => 'You are not logged in' );
-    $self->redirect_to( '/login' );
+    $self->render(
+        'template' => 'login',
+        'status'   => 401,
+    );
     return;
 };
 
@@ -230,6 +233,7 @@ sub get_article {
 
     return $self->render(
         'template' => 'not_found',
+        'status'   => 404,
     ) unless $row;
 
     $self->render_text(
@@ -625,12 +629,8 @@ __DATA__
 
 @@ login.html.ep
 % layout 'default';
-%# if ( my $login = session 'login' ) {
-%#     stash 'title' => 'You are already logged in';
-%# }
-%# else {
 % stash 'title' => 'Login';
-<form method="post">
+<form method="post" action="<%= url_for '/login' %>">
 <dl>
 <dt>Username</dt><dd><input type="text" name="login"></dd>
 <dt>Password</dt><dd><input type="password" name="password"></dd>
@@ -760,7 +760,7 @@ __DATA__
 % my $article_title = param 'title';
 <li><a href="<%= url_for "/search/$article_title" %>">Search for “<%= $article_title %>”</a></li>
 % if ( session 'login' ) {
-<li><a href="<%= url_for /"create/$article_title" %>">Create page “<%= $article_title %>”</a></li>
+<li><a href="<%= url_for "create/$article_title" %>">Create page “<%= $article_title %>”</a></li>
 % }
 </ul>
 
