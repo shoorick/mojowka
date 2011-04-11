@@ -760,7 +760,7 @@ __DATA__
 % my $article_title = param 'title';
 <li><a href="<%= url_for "/search/$article_title" %>">Search for “<%= $article_title %>”</a></li>
 % if ( session 'login' ) {
-<li><a href="<%= url_for "create/$article_title" %>">Create page “<%= $article_title %>”</a></li>
+<li><a href="<%= url_for "/create/$article_title" %>">Create page “<%= $article_title %>”</a></li>
 % }
 </ul>
 
