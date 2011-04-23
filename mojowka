@@ -497,7 +497,7 @@ sub search {
         'template'         => 'search',
         'query'            => $query,
         'rows'             => $rows,
-        'title'            => $title,
+        'title'            => b( $title )->decode('UTF-8')->to_string,
     );
 } # sub search
 
