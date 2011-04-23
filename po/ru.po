@@ -1,0 +1,110 @@
+# Russian language pack for mojowka.
+# Copyright (C) 2011 Alexander Sapozhnikov
+# This file is distributed under the same license as the mojowka.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2011-04-24 01:43+0600\n"
+"PO-Revision-Date: 2011-04-24 02:00+0600\n"
+"Last-Translator: Alexander Sapozhnikov <shoorick@cpan.org>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: Russian\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=3; plural=n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2;"
+
+#: mojowka:90
+msgid "Thanks for logging in"
+msgstr "Спасибо, что зашли"
+
+#: mojowka:93
+msgid "Wrong username or password"
+msgstr "Неправильное имя пользователя или пароль"
+
+#: mojowka:149
+msgid "You are not logged in"
+msgstr "Вы не вошли"
+
+#: mojowka:287
+msgid "Title must be unique"
+msgstr "Заголовок должен быть уникальным"
+
+#: mojowka:293
+msgid "Page content can not be empty"
+msgstr "Содержимое страницы не может быть пустым"
+
+#: mojowka:303 mojowka:339
+msgid "Errors occured"
+msgstr "Произошли ошибки"
+
+#: mojowka:329
+msgid "Changes was saved"
+msgstr "Изменения сохранены"
+
+#: mojowka:334
+msgid "Can not save"
+msgstr "Не могу сохранить"
+
+#: mojowka:354
+msgid "Editing"
+msgstr "Редактирование"
+
+#: mojowka:366
+msgid "New page"
+msgstr "Новая страница"
+
+#: mojowka:392
+msgid "Page was deleted"
+msgstr "Страница удалена"
+
+#: mojowka:449
+msgid "Permission denied"
+msgstr "Доступ запрещён"
+
+#: mojowka:473
+msgid "Exact matching found"
+msgstr "Найдено точное соответствие"
+
+#: mojowka:486
+#, perl-brace-format
+msgid "Found {count} result"
+msgid_plural "Found {count} results"
+msgstr[0] "Найден {count} результат"
+msgstr[1] "Найдено {count} результата"
+msgstr[2] "Найдено {count} результатов"
+
+#: mojowka:519
+msgid "Passwords does not match"
+msgstr "Пароли не совпадают"
+
+#: mojowka:534
+msgid "Wrong old password"
+msgstr "Неверный старый пароль"
+
+#: mojowka:546
+msgid "Password was changed"
+msgstr "Пароль изменён"
+
+#: mojowka:574 mojowka:582
+msgid "Upload failed"
+msgstr "Загрузка не удалась"
+
+#: mojowka:575
+msgid "File is not specified."
+msgstr "Файл не указан."
+
+#: mojowka:583
+msgid "Image size is too large."
+msgstr "Размер изображения слишком велик."
+
+#: mojowka:599
+msgid "Upload failed. Content type is wrong."
+msgstr "Загрузка не удалась. Неверный тип содержимого."
+
+#: mojowka:618
+msgid "Image uploaded"
+msgstr "Изображение загружено"

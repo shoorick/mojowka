@@ -24,7 +24,7 @@ it under the same terms as Perl itself.
 
 use utf8;
 use Mojolicious::Lite;
-use Locale::TextDomain;
+use Locale::TextDomain qw( mojowka locale );
 no warnings 'redefine';
 
 use DBI;
