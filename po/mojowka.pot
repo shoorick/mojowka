@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2011-04-24 01:43+0600\n"
+"POT-Creation-Date: 2011-04-24 02:02+0600\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -18,93 +18,125 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=INTEGER; plural=EXPRESSION;\n"
 
-#: mojowka:90
+#: ../mojowka:90
 msgid "Thanks for logging in"
 msgstr ""
 
-#: mojowka:93
+#: ../mojowka:93
 msgid "Wrong username or password"
 msgstr ""
 
-#: mojowka:149
+#: ../mojowka:149
 msgid "You are not logged in"
 msgstr ""
 
-#: mojowka:287
+#: ../mojowka:287
 msgid "Title must be unique"
 msgstr ""
 
-#: mojowka:293
+#: ../mojowka:293
 msgid "Page content can not be empty"
 msgstr ""
 
-#: mojowka:303 mojowka:339
+#: ../mojowka:303 ../mojowka:339
 msgid "Errors occured"
 msgstr ""
 
-#: mojowka:329
+#: ../mojowka:329
 msgid "Changes was saved"
 msgstr ""
 
-#: mojowka:334
+#: ../mojowka:334
 msgid "Can not save"
 msgstr ""
 
-#: mojowka:354
+#: ../mojowka:354
 msgid "Editing"
 msgstr ""
 
-#: mojowka:366
+#: ../mojowka:366
 msgid "New page"
 msgstr ""
 
-#: mojowka:392
+#: ../mojowka:392
 msgid "Page was deleted"
 msgstr ""
 
-#: mojowka:449
+#: ../mojowka:449
 msgid "Permission denied"
 msgstr ""
 
-#: mojowka:473
+#: ../mojowka:473
 msgid "Exact matching found"
 msgstr ""
 
-#: mojowka:486
+#: ../mojowka:486
 #, perl-brace-format
 msgid "Found {count} result"
 msgid_plural "Found {count} results"
 msgstr[0] ""
 msgstr[1] ""
 
-#: mojowka:519
+#: ../mojowka:519
 msgid "Passwords does not match"
 msgstr ""
 
-#: mojowka:534
+#: ../mojowka:534
 msgid "Wrong old password"
 msgstr ""
 
-#: mojowka:546
+#: ../mojowka:546
 msgid "Password was changed"
 msgstr ""
 
-#: mojowka:574 mojowka:582
+#: ../mojowka:574 ../mojowka:582
 msgid "Upload failed"
 msgstr ""
 
-#: mojowka:575
+#: ../mojowka:575
 msgid "File is not specified."
 msgstr ""
 
-#: mojowka:583
+#: ../mojowka:583
 msgid "Image size is too large."
 msgstr ""
 
-#: mojowka:599
+#: ../mojowka:599
 msgid "Upload failed. Content type is wrong."
 msgstr ""
 
-#: mojowka:618
+#: ../mojowka:618
 msgid "Image uploaded"
+msgstr ""
+
+#: ../mojowka:628
+msgid "User list"
+msgstr ""
+
+#: ../mojowka:637
+msgid "Login"
+msgstr ""
+
+#: ../mojowka:640
+msgid "Username"
+msgstr ""
+
+#: ../mojowka:641
+msgid "Password"
+msgstr ""
+
+#: ../mojowka:712
+msgid "Change"
+msgstr ""
+
+#: ../mojowka:739
+msgid "Find"
+msgstr ""
+
+#: ../mojowka:755
+msgid "Just uploaded"
+msgstr ""
+
+#: ../mojowka:902
+msgid "ERROR"
 msgstr ""
