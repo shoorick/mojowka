@@ -24,6 +24,7 @@ it under the same terms as Perl itself.
 
 use utf8;
 use Mojolicious::Lite;
+use Locale::TextDomain;
 no warnings 'redefine';
 
 use DBI;
@@ -32,7 +33,7 @@ use File::Path     'mkpath';
 use Mojo::ByteStream 'b';
 use Text::Textile;
 
-our $VERSION=0.02;
+our $VERSION=0.03;
 
 my $dbfile
     = $ENV{'MOJOWKA_DATAFILE'}
@@ -86,11 +87,11 @@ post '/login' => sub {
 
         if ( $row ) {
             $self->session( 'login' => $login );
-            $self->flash( 'message' => 'Thanks for logging in' );
+            $self->flash( 'message' => __ 'Thanks for logging in' );
         }
         else {
-              $self->flash( 'message' => 'Wrong username or password' );
-              $redirect = '/login';
+            $self->flash( 'message' => __ 'Wrong username or password' );
+            $redirect = '/login';
         }
     }
     else {
@@ -145,7 +146,7 @@ ladder sub { #same as under
         if $self->session( 'login' );
 
     # Not authenticated
-    $self->flash( 'message' => 'You are not logged in' );
+    $self->flash( 'message' => __ 'You are not logged in' );
     $self->render(
         'template' => 'login',
         'status'   => 401,
@@ -177,6 +178,11 @@ get '/profile/:login' => \&get_user;
 get '/(*title)'       => \&get_article;
 get '/'               => \&get_article;
 
+plugin 'charset' => { 'charset' => 'utf8' };
+plugin 'textdomain' => {
+    'domain'      => 'mojowka',
+    'search_dirs' => [ 'locale' ],
+};
 app->types->type( 'html' => 'text/html; charset=utf-8' );
 app->secret( 'mojowka' );
 app->start( @ARGV ? @ARGV : 'daemon' );
@@ -278,13 +284,13 @@ sub edit_article {
                     $article_title, $id,
                 )
             ) {
-                push ( @errors, 'Title must be unique' );
+                push ( @errors, __ 'Title must be unique' );
                 last TRY;
             } # if
 
             # is content empty?
             unless ( $article_content ) {
-                push ( @errors, 'Page content can not be empty' );
+                push ( @errors, __ 'Page content can not be empty' );
                 last TRY;
             }
 
@@ -294,7 +300,7 @@ sub edit_article {
             return $self->render(
                 'errors'            => [ @errors ],
                 'template'          => 'edit_article',
-                'title'             => 'Errors occured',
+                'title'             => __ 'Errors occured',
                 'id'                => $id,
                 'article_content'   => $article_content,
                 'article_title'     => $article_title,
@@ -320,17 +326,17 @@ sub edit_article {
 
         if ( $rows_affected ) {
             $article_title =~ tr/ /_/;
-            $self->flash( 'message' => 'Changes was saved' );
+            $self->flash( 'message' => __ 'Changes was saved' );
             $self->redirect_to( "/$article_title" );
         }
         # else NOT saved
 
-        push ( @errors, 'Can not save' );
+        push ( @errors, __ 'Can not save' );
 
         return $self->render(
             'errors'            => [ @errors ],
             'template'          => 'edit_article',
-            'title'             => 'Errors occured',
+            'title'             => __ 'Errors occured',
             'id'                => $id,
             'article_content'   => $article_content,
             'article_title'     => $article_title,
@@ -345,7 +351,7 @@ sub edit_article {
             my $article_title = b($row->{'title'})->decode('UTF-8');
             return $self->render(
                 'template'          => 'edit_article',
-                'title'             => 'Editing',
+                'title'             => __ 'Editing',
                 'id'                => $id,
                 'article_content'   => b($row->{'text'} )->decode('UTF-8'),
                 'article_title'     => $article_title,
@@ -357,7 +363,7 @@ sub edit_article {
         $article_title =~ tr/_/ /;
         return $self->render(
             'template'          => 'edit_article',
-            'title'             => 'New page',
+            'title'             => __ 'New page',
             'id'                => 0,
             'article_content'   => '',
             'article_title'     => $article_title,
@@ -383,7 +389,7 @@ sub delete_article {
     );
 
     if ( $rows_affected == 1 ) { # deleted without errors
-        $self->flash( 'message' => 'Page was deleted' );
+        $self->flash( 'message' => __ 'Page was deleted' );
         $self->redirect_to( '/' );
     } # if deleted
 } # sub delete_article
@@ -440,7 +446,7 @@ sub get_userlist {
         ) 
     }
     # else
-    $self->flash( 'message' => 'Permission denied' );
+    $self->flash( 'message' => __ 'Permission denied' );
     $self->redirect_to( '/login' );
 } # sub get_userlist
 
@@ -464,7 +470,7 @@ sub search {
             $query,
         );
         if ( @$row ) {
-            $self->flash( 'message' => 'Exact matching found' );
+            $self->flash( 'message' => __ 'Exact matching found' );
             $query = b( shift @$row )->decode('UTF-8')->to_string;
             $query =~ tr/ /_/;
             $self->redirect_to( "/$query" );
@@ -477,8 +483,7 @@ sub search {
             "%$query%", "%$query%",
         );
 
-        # TODO Change to gettext based proper singular/plural form
-        $title = 'Found ' . scalar @$rows . ' results';
+        $title = __nx 'Found {count} result', 'Found {count} results', scalar @$rows, 'count' => scalar @$rows;
 
         foreach my $row ( @$rows ) {
             $row = b( $row )->decode('UTF-8')->to_string;
@@ -511,7 +516,7 @@ sub change_password {
     my $repeat_new_password = $self->param( 'repeat_new_password' ) || '';
 
     if ( $new_password ne $repeat_new_password ) {
-        $self->flash( 'message' => 'Passwords does not match' );
+        $self->flash( 'message' => __ 'Passwords does not match' );
         $self->redirect_to( $redirect );
         return;
     }
@@ -526,7 +531,7 @@ sub change_password {
 
     # Wrong old password
     unless ( $row ) {
-        $self->flash( 'message' => 'Wrong old password' );
+        $self->flash( 'message' => __ 'Wrong old password' );
         $self->redirect_to( $redirect );
         return;
     }
@@ -538,7 +543,7 @@ sub change_password {
     );
     
     if ( $rows_affected ) {
-        $self->flash( 'message' => 'Password was changed' );
+        $self->flash( 'message' => __ 'Password was changed' );
         $redirect = "/profile/$login";
     }
     else {
@@ -566,19 +571,19 @@ sub upload_image {
     # Nothing uploaded
     return $self->render(
         'template' => 'error',
-        'title'    => 'Upload failed',
-        'errors'   => [ 'File is not specified.' ],
+        'title'    => __ 'Upload failed',
+        'errors'   => [ __ 'File is not specified.' ],
     )
         unless $image;
     
     # Skip oversized
     return $self->render(
         'template' => 'error',
-        'title'    => 'Upload failed',
-        'errors'   => [ 'Image size is too large.' ],
+        'title'    => __ 'Upload failed',
+        'errors'   => [ __ 'Image size is too large.' ],
     )
-        if $ENV{MOJO_MAX_MESSAGE_SIZE}
-        && $ENV{MOJO_MAX_MESSAGE_SIZE} < $image->size;
+        if $ENV{'MOJO_MAX_MESSAGE_SIZE'}
+        && $ENV{'MOJO_MAX_MESSAGE_SIZE'} < $image->size;
     
     
     # Check file type
@@ -591,7 +596,7 @@ sub upload_image {
         # Content type is wrong
         return $self->render(
             template => 'error',
-            message  => "Upload fail. Content type is wrong."
+            message  => __ 'Upload failed. Content type is wrong.'
         );
     
     
@@ -610,7 +615,7 @@ sub upload_image {
     $image->move_to($image_file);
     
     $self->render(
-        'title'    => 'Image uploaded',
+        'title'    => __ 'Image uploaded',
         'link'     => $image_link,
         'template' => 'upload_image',
     );
@@ -620,7 +625,7 @@ sub upload_image {
 __DATA__
 
 @@ userlist.html.ep
-% layout 'default', 'title' => 'User list';
+% layout 'default', 'title' => __ 'User list';
 <ul>
 % foreach my $row (@$rows) {
     <li><a href="<%= url_for "/profile/$row->{'login'}" %>"><%= $row->{'login'} %></a></li>
@@ -629,13 +634,13 @@ __DATA__
 
 @@ login.html.ep
 % layout 'default';
-% stash 'title' => 'Login';
+% stash 'title' => __ 'Login';
 <form method="post" action="<%= url_for '/login' %>">
 <dl>
-<dt>Username</dt><dd><input type="text" name="login"></dd>
-<dt>Password</dt><dd><input type="password" name="password"></dd>
+<dt><%= __ 'Username' %></dt><dd><input type="text" name="login"></dd>
+<dt><%= __ 'Password' %></dt><dd><input type="password" name="password"></dd>
 </dl>
-<input type="submit" value="Login">
+<input type="submit" value="<%= __ 'Login' %>">
 </form>
 %# } # else
 
@@ -649,7 +654,7 @@ __DATA__
             $('#matching').html( '' );
             return true;
         }
-        $('#matching').html( 'Passwords does not match' );
+        $('#matching').html( __ 'Passwords does not match' );
         return false;
     }
 
@@ -661,25 +666,25 @@ __DATA__
             // Strong password must be at least 8 characters long
             // and must contain letters in other cases, digits and punctuation signs
             var np = $('#new_password').val();
-            var strength = 'Strong password';
+            var strength = '<%= __ 'Strong password' %>';
 
             if ( np.length == 0 ) {
-                strength = 'Empty password';
+                strength = '<%= __ 'Empty password' %>';
             }
             else if ( np.length < 8 ) {
-                strength = 'Too short password';
+                strength = '<%= __ 'Too short password' %>';
             }
             else if ( np == '<%= session 'login' %>' ) {
-                strength = 'Password and login are equal';
+                strength = '<%= __ 'Password and login are equal' %>';
             }
             else if ( ! np.match(/\d/)  ) {
-                strength = 'Missing digits';
+                strength = '<%= __ 'Missing digits' %>';
             }
             else if ( ! np.match(/[a-z]/)  ) {
-                strength = 'Missing small letters';
+                strength = '<%= __ 'Missing small letters' %>';
             }
             else if ( ! np.match(/[A-Z]/)  ) {
-                strength = 'Missing capital letters';
+                strength = '<%= __ 'Missing capital letters' %>';
             }
             $('#strength').html( strength );
         });
@@ -695,35 +700,35 @@ __DATA__
         });
     });
 </script>
-% stash 'title' => 'Change password';
+% stash 'title' => __ 'Change password';
 <form method="post" id="password_form">
 <dl>
-<dt>Old Password</dt><dd><input type="password" name="old_password"></dd>
-<dt>New Password</dt><dd><input type="password" name="new_password" id="new_password">
+<dt><%= __ 'Old Password' %></dt><dd><input type="password" name="old_password"></dd>
+<dt><%= __ 'New Password' %></dt><dd><input type="password" name="new_password" id="new_password">
 <em class="tip" id="strength"></em></dd>
-<dt>Repeat new password</dt><dd><input type="password" name="repeat_new_password" id="repeat_new_password">
+<dt><%= __ 'Repeat new password' %></dt><dd><input type="password" name="repeat_new_password" id="repeat_new_password">
 <em class="tip" id="matching"></em></dd>
 </dl>
-<input type="submit" value="Change">
+<input type="submit" value="<%= __ 'Change' %>">
 </form>
 %# } # else
 
 
 @@ sitemap.html.ep
-% layout 'default', 'title' => 'Sitemap';
+% layout 'default', 'title' => __ 'Sitemap';
 <ul>
 % for my $row ( @$rows ) {
 %   my $link = $row;
 %   $link =~ tr/ /_/;
-%   $row  ||= 'Main page';
+%   $row  ||= __ 'Main page';
     <li><a href="<%= url_for "/$link" %>"><%= $row %></a></li>
 % }
 </ul>
-<h2>Special pages</h2>
+<h2><%= __ 'Special pages' %></h2>
 <ul>
-<li><a href="<%= url_for '/search'  %>">Search</a></li>
-<li><a href="<%= url_for '/sitemap' %>">Sitemap</a></li>
-<li><a href="<%= url_for '/login'   %>">Login</a></li>
+<li><a href="<%= url_for '/search'  %>"><%= __ 'Search' %></a></li>
+<li><a href="<%= url_for '/sitemap' %>"><%= __ 'Sitemap' %></a></li>
+<li><a href="<%= url_for '/login'   %>"><%= __ 'Login' %></a></li>
 </ul>
 
 
@@ -731,14 +736,14 @@ __DATA__
 % layout 'default';
 <form action="<%= url_for '/search' %>">
 <input type="text" name="query" value="<%= $query %>">
-<input type="submit" value="Find">
+<input type="submit" value="<%= __ 'Find' %>">
 </dl>
 </form>
 <ol>
 % for my $row ( @$rows ) {
 %   my $link = $row;
 %   $link =~ tr/ /_/;
-%   $row  ||= 'Main page';
+%   $row  ||= __ 'Main page';
     <li><a href="<%= url_for "/$link" %>"><%= $row %></a></li>
 % }
 </ol>
@@ -746,21 +751,21 @@ __DATA__
 
 @@ upload_image.html.ep
 % layout 'default';
-<p>Image uploaded as <a href="<%= url_for $link %>"><%= url_for $link %></a>:
-<br><img src="<%= url_for $link %>" alt="Just uploaded"></p>
+<p><%= __ 'Image uploaded as' %> <a href="<%= url_for $link %>"><%= url_for $link %></a>:
+<br><img src="<%= url_for $link %>" alt="<%= __ 'Just uploaded' %>"></p>
 <p>You can insert this image to pages with following code:</p>
 <blockquote><code>!<%= url_for $link %>!</code></blockquote>
 
 
 @@ not_found.html.ep
 % layout 'error';
-% stash 'title' => 'Not Found - ERROR 404';
-<h1>Not found</h1><p>Document you requested was not found.</p>
+% stash 'title' => __ 'Not Found - ERROR 404';
+<h1><%= __ 'Not found' %></h1><p><% __ 'Document you requested was not found.' %></p>
 <ul>
 % my $article_title = param 'title';
-<li><a href="<%= url_for "/search/$article_title" %>">Search for “<%= $article_title %>”</a></li>
+<li><a href="<%= url_for "/search/$article_title" %>"><%= __x  'Search for “{title}”', 'title' => $article_title %></a></li>
 % if ( session 'login' ) {
-<li><a href="<%= url_for "create/$article_title" %>">Create page “<%= $article_title %>”</a></li>
+<li><a href="<%= url_for "create/$article_title" %>">><%= __x 'Create page “{title}”', 'title' => $article_title %></a></li>
 % }
 </ul>
 
@@ -768,14 +773,14 @@ __DATA__
 @@ image_not_found.html.ep
 % layout 'error';
 % stash 'title' => 'Not Found - ERROR 404';
-<h1>Not found</h1><p>Image you requested was not found.</p>
+<h1><%= __ 'Not found' %></h1><p><% __ 'Image you requested was not found.' %></p>
 <ul>
 % my $article_title = param 'title';
-<li><a href="<%= url_for "/search/$article_title" %>">Search for “<%= $article_title %>”</a></li>
+<li><a href="<%= url_for "/search/$article_title" %>"><%= __x  'Search for “{title}”', 'title' => $article_title %></a></li>
 % if ( session 'login' ) {
-<li><form action="<%= url_for "/images/$article_title" %>" method="post" enctype ="multipart/form-data">Choose an image
-<input type="file" name="file"> and 
-<input type="submit" value="Upload"></form></li>
+<li><form action="<%= url_for "/images/$article_title" %>" method="post" enctype ="multipart/form-data"><%= __ 'Choose an image' %>
+<input type="file" name="file"> <%= __ 'and' %>
+<input type="submit" value="<%= __ 'Upload' %>"></form></li>
 % }
 </ul>
 
@@ -861,30 +866,30 @@ button:hover{border-color:#69c}
 
 <form method="post" action="<%= url_for "/edit/$id" %>">
 <dl>
-<dt>Title</dt>
+<dt><%= 'Title' %></dt>
 <dd><input type="text" name="title" value="<%= $article_title %>"></dd>
-<dt>Content</dt>
+<dt><%= 'Content' %></dt>
 <dd><span id="toolbar">
-<button type="button" id="btn_bold" title="Bold (Ctrl+B)">Bold</button>
-<button type="button" id="btn_italic" title="Italic (Ctrl+I)">Italic</button>
-<button type="button" id="btn_h1" title="Header 1">Header 1</button>
-<button type="button" id="btn_h2" title="Header 2">Header 2</button>
-<button type="button" id="btn_h3" title="Header 3">Header 3</button>
-<button type="button" id="btn_ul" title="Unordered list item">Unordered list item</button>
-<button type="button" id="btn_ol" title="Ordered list item">Ordered list item</button>
+<button type="button" id="btn_bold" title="<%= 'Bold (Ctrl+B)' %>"><%= 'Bold' %></button>
+<button type="button" id="btn_italic" title="<%= 'Italic (Ctrl+I)' %>"><%= 'Italic' %></button>
+<button type="button" id="btn_h1" title="<%= 'Header 1' %>"><%= 'Header 1' %></button>
+<button type="button" id="btn_h2" title="<%= 'Header 2' %>"><%= 'Header 2' %></button>
+<button type="button" id="btn_h3" title="<%= 'Header 3' %>"><%= 'Header 3' %></button>
+<button type="button" id="btn_ul" title="<%= 'Unordered list item' %>"><%= 'Unordered list item' %></button>
+<button type="button" id="btn_ol" title="<%= 'Ordered list item' %>"><%= 'Ordered list item' %></button>
 </span>
 <br><textarea name="article" id="article"><%= $article_content %></textarea>
-<br><a href="http://search.cpan.org/perldoc?Text::Textile#SYNTAX">textile syntax</a>
+<br><a href="http://search.cpan.org/perldoc?Text::Textile#SYNTAX"><%= 'textile syntax' %></a>
 </dd>
 </dl>
-<input type="submit" value="Save">
-<a href="#" id="preview_link">Preview</a>
+<input type="submit" value="<%= 'Save' %>">
+<a href="#" id="preview_link"><%= 'Preview' %></a>
 % if ( my $old_title = stash 'old_title' ) {
-    <a href="<%= url_for "/$old_title" %>">Cancel</a>
+    <a href="<%= url_for "/$old_title" %>"><%= 'Cancel' %></a>
 % }
 % if ( $id ) {
     <a href="<%= url_for "/delete/$id" %>" id="delete_link"
-    onclick="return confirm('Do you really want to delete this page?')">Delete page</a>
+    onclick="return confirm('<%= 'Do you really want to delete this page?' %>')"><%= 'Delete page' %></a>
 % }
 </form>
 <div id="preview_area"></div>
@@ -894,7 +899,7 @@ button:hover{border-color:#69c}
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
 <html>
     <head>
-        <title><%= $title || 'ERROR' %></title>
+        <title><%= $title || __ 'ERROR' %></title>
         <style type="text/css">body{background:#fec;color:#000}h1{color:#900}</style>
     </head>
     <body>
@@ -907,7 +912,7 @@ button:hover{border-color:#69c}
 @@ layouts/default.html.ep
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
 <html>
-    <head><title><%= $title || 'Welcome' %></title>
+    <head><title><%= $title || __ 'Welcome' %></title>
     <link rel="shortcut icon" href="<%= url_for '/favicon.ico' %>">
 %# Maybe You can replace next line
 %# with <link rel="stylesheet" type="text/css" link="style.css">
@@ -922,12 +927,12 @@ button:hover{border-color:#69c}
 
 % if ( my $login = session 'login' ) {
         <ul id="logged">
-            <li>Logged as <a
+            <li><%= 'Logged as' %> <a
                 href="<%= url_for "/profile/$login" %>"><%= $login %></a></li>
-            <li><a href="<%= url_for '/change_password' %>">Change password</a></li>
-            <li><a href="<%= url_for '/logout' %>">Logout</a></li>
+            <li><a href="<%= url_for '/change_password' %>"><%= 'Change password' %></a></li>
+            <li><a href="<%= url_for '/logout' %>"><%= 'Logout' %></a></li>
 %            if ( my $id = stash 'id' ) {
-                <li><a href="<%= url_for "/edit/$id" %>">Edit this page</a></li>
+                <li><a href="<%= url_for "/edit/$id" %>"><%= 'Edit this page' %></a></li>
 %            }
         </ul>
 % }
@@ -938,8 +943,8 @@ button:hover{border-color:#69c}
 
 
 @@ menu.html.ep
-<ul id="menu"><li><a href="<%= url_for '/' %>">Main page</a></li><li><a
-    href="<%= url_for '/sitemap' %>">Sitemap</a></li><li><form
+<ul id="menu"><li><a href="<%= url_for '/' %>"><%= 'Main page' %></a></li><li><a
+    href="<%= url_for '/sitemap' %>"><%= 'Sitemap' %></a></li><li><form
     action="<%= url_for '/search' %>"><input type="text" name="query"></form></li></ul>
 
 @@ style.css.html.ep
