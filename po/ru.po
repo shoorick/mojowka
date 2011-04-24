@@ -222,11 +222,11 @@ msgid "Missing capital letters"
 msgstr "Отсутствуют большие буквы"
 
 #: ../mojowka:775
-msgid "Search for “{title}”"
+msgid "Search for &ldquo;{title}&rdquo;"
 msgstr "Искать «{title}»"
 
 #: ../mojowka:777
-msgid "Create page “{title}”"
+msgid "Create page &ldquo;{title}&rdquo;"
 msgstr "Создать страницу «{title}»"
 
 # extracted by extract.pl
@@ -261,9 +261,13 @@ msgstr "Главная страница"
 msgid "Special pages"
 msgstr "Специальные страницы"
 
+#: ../mojowka:760
+msgid "Image uploaded and saved as {link}"
+msgstr "Изображение загружено и сохранено как {link}"
+
 #: ../mojowka:762
-msgid "Image uploaded as"
-msgstr "Изображение загружено как"
+msgid "You can insert this image to pages with following code:"
+msgstr "Вы можете вставить изображение на страницы, используя код:"
 
 #: ../mojowka:770
 msgid "Not Found - ERROR 404"

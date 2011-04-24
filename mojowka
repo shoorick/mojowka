@@ -145,9 +145,8 @@ get '/sitemap' => sub {
 get '/search/:query' => \&search;
 get '/search'        => \&search;
 
-
 # Authentication
-ladder sub { #same as under
+under sub {
     my $self = shift;
 
     # Authenticated
@@ -179,9 +178,9 @@ get  '/change_password'     =>  'change_password';
 post '/change_password'     => \&change_password;
 
 # Other requests
-ladder sub { 1 };
+under sub { 1 };
 
-get '/images/(*title)' => 'image_not_found';
+get '/images/(*title)' => 'imagestitle';
 
 get '/profile/:login' => \&get_user;
 get '/(*title)'       => \&get_article;
@@ -304,10 +303,10 @@ sub edit_article {
             return $self->render(
                 'errors'            => [ @errors ],
                 'template'          => 'edit_article',
-                'title'             => __ 'Errors occured',
+                'title'             => b( __ 'Errors occured' )->decode( 'UTF-8' ),
                 'id'                => $id,
                 'article_content'   => $article_content,
-                'article_title'     => $article_title,
+                'article_title'     => b( $article_title )->decode( 'UTF-8' ),
             );
         } # if errors
         # else OK
@@ -340,10 +339,10 @@ sub edit_article {
         return $self->render(
             'errors'            => [ @errors ],
             'template'          => 'edit_article',
-            'title'             => __ 'Errors occured',
+            'title'             => b( __ 'Errors occured' )->decode( 'UTF-8' ),
             'id'                => $id,
             'article_content'   => $article_content,
-            'article_title'     => $article_title,
+            'article_title'     => b( $article_title )->decode( 'UTF-8' ),
         );
 
     } # if POST
@@ -352,12 +351,12 @@ sub edit_article {
         my $row = $dbh->selectrow_hashref(q{SELECT * FROM page WHERE id=?}, {}, $id);
 
         if ( $row ) {
-            my $article_title = b($row->{'title'})->decode('UTF-8');
+            my $article_title = b( $row->{'title'} )->decode( 'UTF-8' );
             return $self->render(
                 'template'          => 'edit_article',
-                'title'             => __ 'Editing',
+                'title'             => b( __ 'Editing' )->decode( 'UTF-8' ),
                 'id'                => $id,
-                'article_content'   => b($row->{'text'} )->decode('UTF-8'),
+                'article_content'   => b( $row->{'text'} )->decode( 'UTF-8' ),
                 'article_title'     => $article_title,
                 'old_title'         => $article_title,
             );
@@ -367,10 +366,10 @@ sub edit_article {
         $article_title =~ tr/_/ /;
         return $self->render(
             'template'          => 'edit_article',
-            'title'             => __ 'New page',
+            'title'             => b( __ 'New page' )->decode( 'UTF-8' ),
             'id'                => 0,
             'article_content'   => '',
-            'article_title'     => $article_title,
+            'article_title'     => b( $article_title )->decode( 'UTF-8' ),
         );
     } # else
 } # sub edit_article
@@ -494,7 +493,7 @@ sub search {
             'count' => scalar @$rows;
 
         foreach my $row ( @$rows ) {
-            $row = b( $row )->decode('UTF-8')->to_string;
+            $row = b( $row )->decode('UTF-8');
         }
 
     } # if query
@@ -503,7 +502,7 @@ sub search {
         'template'         => 'search',
         'query'            => $query,
         'rows'             => $rows,
-        'title'            => $title,
+        'title'            => b( $title )->decode('UTF-8'),
     );
 } # sub search
 
@@ -579,7 +578,7 @@ sub upload_image {
     # Nothing uploaded
     return $self->render(
         'template' => 'error',
-        'title'    => __ 'Upload failed',
+        'title'    => b( __ 'Upload failed' )->decode( 'UTF-8' ),
         'errors'   => [ __ 'File is not specified.' ],
     )
         unless $image;
@@ -587,7 +586,7 @@ sub upload_image {
     # Skip oversized
     return $self->render(
         'template' => 'error',
-        'title'    => __ 'Upload failed',
+        'title'    => b( __ 'Upload failed' )->decode( 'UTF-8' ),
         'errors'   => [ __ 'Image size is too large.' ],
     )
         if $ENV{'MOJO_MAX_MESSAGE_SIZE'}
@@ -607,7 +606,6 @@ sub upload_image {
             message  => __ 'Upload failed. Content type is wrong.'
         );
     
-    
     # Image file
     my $image_file = "$IMAGE_DIR/$title.$ext";
     
@@ -623,7 +621,7 @@ sub upload_image {
     $image->move_to($image_file);
     
     $self->render(
-        'title'    => __ 'Image uploaded',
+        'title'    => b( __ 'Image uploaded' )->decode( 'UTF-8' ),
         'link'     => $image_link,
         'template' => 'upload_image',
     );
@@ -759,10 +757,9 @@ __DATA__
 
 @@ upload_image.html.ep
 % layout 'default';
-%# TODO replace __ with __p
-<p><%= __ 'Image uploaded as' %> <a href="<%= url_for $link %>"><%= url_for $link %></a>:
+<p><%= __x 'Image uploaded and saved as {link}', 'link' => url_for $link %>
 <br><img src="<%= url_for $link %>" alt="<%= __ 'Just uploaded' %>"></p>
-<p>You can insert this image to pages with following code:</p>
+<p><%= __ 'You can insert this image to pages with following code:' %></p>
 <blockquote><code>!<%= url_for $link %>!</code></blockquote>
 
 
@@ -772,20 +769,20 @@ __DATA__
 <h1><%= __ 'Not found' %></h1><p><%= __ 'Document you requested was not found.' %></p>
 <ul>
 % my $article_title = param 'title';
-<li><a href="<%= url_for "/search/$article_title" %>"><%= __x  'Search for “{title}”', 'title' => $article_title %></a></li>
+<li><a href="<%= url_for "/search/$article_title" %>"><%= __x  'Search for &ldquo;{title}&rdquo;', 'title' => $article_title %></a></li>
 % if ( session 'login' ) {
-<li><a href="<%= url_for "create/$article_title" %>"><%= __x 'Create page “{title}”', 'title' => $article_title %></a></li>
+<li><a href="<%= url_for "create/$article_title" %>"><%= __x 'Create page &ldquo;{title}&rdquo;', 'title' => $article_title %></a></li>
 % }
 </ul>
 
 
-@@ image_not_found.html.ep
+@@ imagestitle.html.ep
 % layout 'error';
 % stash 'title' => 'Not Found - ERROR 404';
 <h1><%= __ 'Not found' %></h1><p><%= __ 'Image you requested was not found.' %></p>
 <ul>
 % my $article_title = param 'title';
-<li><a href="<%= url_for "/search/$article_title" %>"><%= __x  'Search for “{title}”', 'title' => $article_title %></a></li>
+<li><a href="<%= url_for "/search/$article_title" %>"><%= __x  'Search for &ldquo;{title}&rdquo;', 'title' => $article_title %></a></li>
 % if ( session 'login' ) {
 <li><form action="<%= url_for "/images/$article_title" %>" method="post" enctype ="multipart/form-data"><%= __ 'Choose an image' %>
 <input type="file" name="file"> <%= __ 'and' %>
@@ -868,7 +865,7 @@ button:hover{border-color:#69c}
 % if ( my $errors = stash 'errors' ) {
     <ul id="errors">
 %   for my $error ( @$errors ) {
-        <li><%= $error %></li>
+        <li><%= b( $error )->decode('UTF-8')->to_string %></li>
 %   }
     </ul>
 % } # if
@@ -922,8 +919,7 @@ button:hover{border-color:#69c}
 @@ layouts/default.html.ep
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
 <html>
-% $title = b( $title || __ 'Welcome' )->decode('UTF-8')->to_string; 
-    <head><title><%= $title %></title>
+    <head><title><%= $title || __ 'Welcome'%></title>
     <link rel="shortcut icon" href="<%= url_for '/favicon.ico' %>">
 %# Maybe You can replace next line
 %# with <link rel="stylesheet" type="text/css" link="style.css">
@@ -933,7 +929,7 @@ button:hover{border-color:#69c}
     <body>
 %= include 'menu';
 % if ( my $message = flash 'message' ) {
-        <div id="message"><%= $message %></div>
+        <div id="message"><%= b( $message )->decode('UTF-8')->to_string %></div>
 % }
 
 % if ( my $login = session 'login' ) {
