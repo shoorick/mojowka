@@ -67,9 +67,7 @@ plugin 'textdomain' => {
 
 app->hook( 'after_static_dispatch' => sub {
     my $self = shift;
-    my $lang = $self->detect_language;
-    app->log->debug( "lang=$lang" );
-    $self->set_language( $lang );
+    $self->set_language( $self->session( 'language' ) || $self->detect_language );
 });
 
 # my $JQUERY_URL = '/jquery-1.5.1.min.js';
@@ -123,6 +121,10 @@ get '/logout' => sub {
     my $redirect = $self->param('redirect') || '/';
     $self->redirect_to( $redirect );
 }; # => 'logout';
+
+get '/set_language'           => \&set_language;
+get '/set_language/:language' => \&set_language;
+
 
 post '/preview' => sub {
     my $self = shift;
@@ -569,7 +571,8 @@ sub change_password {
 
 } # sub change_password
 
-=head2  upload_image
+
+=head2 upload_image
 
 Upload image file.
 See L<http://d.hatena.ne.jp/yukikimoto/20100212/1265989676> for more details. 
@@ -635,6 +638,21 @@ sub upload_image {
     );
     
 } # sub upload_image
+
+
+=head2  set_language
+
+Set preferred language.
+Called as set_language/I<ln> or as set_language?language=I<ln>, where I<ln> is language code.
+In version 0.0.3 available 2 languages: English and Russian.
+
+=cut
+
+sub set_language {
+    my $self = shift;
+    $self->session( 'language' => $self->param( 'language' ) );
+    $self->redirect_to( $self->req->headers->referrer || '/' );
+} # sub set_language
 
 __DATA__
 
