@@ -5,9 +5,9 @@
 #, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: PACKAGE VERSION\n"
+"Project-Id-Version: 0.0.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2011-04-24 02:21+0600\n"
+"POT-Creation-Date: 2011-04-24 12:15+0600\n"
 "PO-Revision-Date: 2011-04-24 02:00+0600\n"
 "Last-Translator: Alexander Sapozhnikov <shoorick@cpan.org>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -18,166 +18,170 @@ msgstr ""
 "Plural-Forms: nplurals=3; plural=n%10==1 && n%100!=11 ? 0 : n%10>=2 && n"
 "%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2;\n"
 
-#: ../mojowka:97
+#: ../mojowka:99
 msgid "Thanks for logging in"
 msgstr "Спасибо, что зашли"
 
-#: ../mojowka:100
+#: ../mojowka:102
 msgid "Wrong username or password"
 msgstr "Неправильное имя пользователя или пароль"
 
-#: ../mojowka:156
+#: ../mojowka:158
 msgid "You are not logged in"
 msgstr "Вы не вошли"
 
-#: ../mojowka:289
+#: ../mojowka:291
 msgid "Title must be unique"
 msgstr "Заголовок должен быть уникальным"
 
-#: ../mojowka:295
+#: ../mojowka:297
 msgid "Page content can not be empty"
 msgstr "Содержимое страницы не может быть пустым"
 
-#: ../mojowka:305 ../mojowka:341
+#: ../mojowka:307 ../mojowka:343
 msgid "Errors occured"
 msgstr "Произошли ошибки"
 
-#: ../mojowka:331
+#: ../mojowka:333
 msgid "Changes was saved"
 msgstr "Изменения сохранены"
 
-#: ../mojowka:336
+#: ../mojowka:338
 msgid "Can not save"
 msgstr "Не могу сохранить"
 
-#: ../mojowka:356
+#: ../mojowka:358
 msgid "Editing"
 msgstr "Редактирование"
 
-#: ../mojowka:368
+#: ../mojowka:370
 msgid "New page"
 msgstr "Новая страница"
 
-#: ../mojowka:394
+#: ../mojowka:396
 msgid "Page was deleted"
 msgstr "Страница удалена"
 
-#: ../mojowka:451
+#: ../mojowka:453
 msgid "Permission denied"
 msgstr "Доступ запрещён"
 
-#: ../mojowka:475
+#: ../mojowka:466
+msgid "Search"
+msgstr ""
+
+#: ../mojowka:477
 msgid "Exact matching found"
 msgstr "Найдено точное соответствие"
 
-#: ../mojowka:488
+#: ../mojowka:491
 #, perl-brace-format
-msgid "Found {count} result"
-msgid_plural "Found {count} results"
-msgstr[0] "Найден {count} результат"
-msgstr[1] "Найдено {count} результата"
-msgstr[2] "Найдено {count} результатов"
+msgid "Found {count} page"
+msgid_plural "Found {count} pages"
+msgstr[0] "Найдена {count} страница"
+msgstr[1] "Найдено {count} страницы"
+msgstr[2] "Найдено {count} страниц"
 
-#: ../mojowka:521
+#: ../mojowka:527
 msgid "Passwords does not match"
 msgstr "Пароли не совпадают"
 
-#: ../mojowka:536
+#: ../mojowka:542
 msgid "Wrong old password"
 msgstr "Неверный старый пароль"
 
-#: ../mojowka:548
+#: ../mojowka:554
 msgid "Password was changed"
 msgstr "Пароль изменён"
 
-#: ../mojowka:576 ../mojowka:584
+#: ../mojowka:582 ../mojowka:590
 msgid "Upload failed"
 msgstr "Загрузка не удалась"
 
-#: ../mojowka:577
+#: ../mojowka:583
 msgid "File is not specified."
 msgstr "Файл не указан."
 
-#: ../mojowka:585
+#: ../mojowka:591
 msgid "Image size is too large."
 msgstr "Размер изображения слишком велик."
 
-#: ../mojowka:601
+#: ../mojowka:607
 msgid "Upload failed. Content type is wrong."
 msgstr "Загрузка не удалась. Неверный тип содержимого."
 
-#: ../mojowka:620
+#: ../mojowka:626
 msgid "Image uploaded"
 msgstr "Изображение загружено"
 
-#: ../mojowka:630
+#: ../mojowka:636
 msgid "User list"
 msgstr "Список пользователей"
 
-#: ../mojowka:639
+#: ../mojowka:645
 msgid "Login"
 msgstr "Вход"
 
-#: ../mojowka:642
+#: ../mojowka:648
 msgid "Username"
 msgstr "Имя пользователя"
 
-#: ../mojowka:643
+#: ../mojowka:649
 msgid "Password"
 msgstr "Пароль"
 
-#: ../mojowka:714
+#: ../mojowka:720
 msgid "Change"
 msgstr "Изменить"
 
-#: ../mojowka:741
+#: ../mojowka:747
 msgid "Find"
 msgstr "Найти"
 
-#: ../mojowka:757
+#: ../mojowka:763
 msgid "Just uploaded"
 msgstr "Только что загружено"
 
-#: ../mojowka:875
+#: ../mojowka:881
 msgid "Bold (Ctrl+B)"
 msgstr "Жирный (Ctrl+B)"
 
-#: ../mojowka:876
+#: ../mojowka:882
 msgid "Italic (Ctrl+I)"
 msgstr "Курсив (Ctrl+I)"
 
-#: ../mojowka:877
+#: ../mojowka:883
 msgid "Header 1"
 msgstr "Заголовок 1"
 
-#: ../mojowka:878
+#: ../mojowka:884
 msgid "Header 2"
 msgstr "Заголовок 2"
 
-#: ../mojowka:879
+#: ../mojowka:885
 msgid "Header 3"
 msgstr "Заголовок 3"
 
-#: ../mojowka:880
+#: ../mojowka:886
 msgid "Unordered list item"
 msgstr "Элемент ненумерованного списка"
 
-#: ../mojowka:881
+#: ../mojowka:887
 msgid "Ordered list item"
 msgstr "Элемент нумерованного списка"
 
-#: ../mojowka:888
+#: ../mojowka:894
 msgid "Preview"
 msgstr "Просмотр"
 
-#: ../mojowka:890
+#: ../mojowka:896
 msgid "Cancel"
 msgstr "Отменить"
 
-#: ../mojowka:894
+#: ../mojowka:900
 msgid "Delete page"
 msgstr "Удалить страницу"
 
-#: ../mojowka:904
+#: ../mojowka:910
 msgid "ERROR"
 msgstr "ОШИБКА"
