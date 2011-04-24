@@ -221,6 +221,14 @@ msgstr "Отсутствуют маленькие буквы"
 msgid "Missing capital letters"
 msgstr "Отсутствуют большие буквы"
 
+#: ../mojowka:775
+msgid "Search for “{title}”"
+msgstr "Искать «{title}»"
+
+#: ../mojowka:777
+msgid "Create page “{title}”"
+msgstr "Создать страницу «{title}»"
+
 # extracted by extract.pl
 
 #: ../mojowka:665
