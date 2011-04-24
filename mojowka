@@ -61,6 +61,8 @@ plugin 'charset' => { 'charset' => 'utf-8' };
 plugin 'textdomain' => {
     'domain'      => 'mojowka',
     'search_dirs' => [ 'locale' ],
+    'available_languages' => [ 'en', 'ru' ],
+    'default_language'    => 'en',
 };
 
 # my $JQUERY_URL = '/jquery-1.5.1.min.js';
@@ -246,7 +248,7 @@ sub get_article {
 
     $self->render_text(
         markup( b( $row->{'text'} )->decode('UTF-8')->to_string ),
-        'title'  => b( $row->{'title'} )->decode('UTF-8')->to_string,
+        'title'  => $title,
         'layout' => 'default',
         'id'     => $row->{'id'},
     );
@@ -461,7 +463,7 @@ Search pages by title and content
 sub search {
     my $self = shift;
 
-    my $title = 'Search';
+    my $title = __ 'Search';
     my $query = $self->param('query') || '';
     my $rows  = [];
 
@@ -485,7 +487,11 @@ sub search {
             "%$query%", "%$query%",
         );
 
-        $title = __nx 'Found {count} result', 'Found {count} results', scalar @$rows, 'count' => scalar @$rows;
+        $title = __nx
+            'Found {count} page',
+            'Found {count} pages',
+            scalar @$rows,
+            'count' => scalar @$rows;
 
         foreach my $row ( @$rows ) {
             $row = b( $row )->decode('UTF-8')->to_string;
@@ -497,7 +503,7 @@ sub search {
         'template'         => 'search',
         'query'            => $query,
         'rows'             => $rows,
-        'title'            => b( $title )->decode('UTF-8')->to_string,
+        'title'            => $title,
     );
 } # sub search
 
@@ -656,7 +662,7 @@ __DATA__
             $('#matching').html( '' );
             return true;
         }
-        $('#matching').html( __ 'Passwords does not match' );
+        $('#matching').html('<%= __ 'Passwords does not match' %>');
         return false;
     }
 
@@ -762,12 +768,12 @@ __DATA__
 @@ not_found.html.ep
 % layout 'error';
 % stash 'title' => __ 'Not Found - ERROR 404';
-<h1><%= __ 'Not found' %></h1><p><% __ 'Document you requested was not found.' %></p>
+<h1><%= __ 'Not found' %></h1><p><%= __ 'Document you requested was not found.' %></p>
 <ul>
 % my $article_title = param 'title';
 <li><a href="<%= url_for "/search/$article_title" %>"><%= __x  'Search for “{title}”', 'title' => $article_title %></a></li>
 % if ( session 'login' ) {
-<li><a href="<%= url_for "create/$article_title" %>">><%= __x 'Create page “{title}”', 'title' => $article_title %></a></li>
+<li><a href="<%= url_for "create/$article_title" %>"><%= __x 'Create page “{title}”', 'title' => $article_title %></a></li>
 % }
 </ul>
 
@@ -775,7 +781,7 @@ __DATA__
 @@ image_not_found.html.ep
 % layout 'error';
 % stash 'title' => 'Not Found - ERROR 404';
-<h1><%= __ 'Not found' %></h1><p><% __ 'Image you requested was not found.' %></p>
+<h1><%= __ 'Not found' %></h1><p><%= __ 'Image you requested was not found.' %></p>
 <ul>
 % my $article_title = param 'title';
 <li><a href="<%= url_for "/search/$article_title" %>"><%= __x  'Search for “{title}”', 'title' => $article_title %></a></li>
@@ -901,7 +907,8 @@ button:hover{border-color:#69c}
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
 <html>
     <head>
-        <title><%= $title || __ 'ERROR' %></title>
+% $title = b( $title || __ 'ERROR' )->decode('UTF-8')->to_string; 
+        <title><%= $title %></title>
         <style type="text/css">body{background:#fec;color:#000}h1{color:#900}</style>
     </head>
     <body>
@@ -914,7 +921,8 @@ button:hover{border-color:#69c}
 @@ layouts/default.html.ep
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
 <html>
-    <head><title><%= $title || __ 'Welcome' %></title>
+% $title = b( $title || __ 'Welcome' )->decode('UTF-8')->to_string; 
+    <head><title><%= $title %></title>
     <link rel="shortcut icon" href="<%= url_for '/favicon.ico' %>">
 %# Maybe You can replace next line
 %# with <link rel="stylesheet" type="text/css" link="style.css">
