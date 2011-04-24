@@ -978,7 +978,7 @@ button:hover{border-color:#69c}
 @@ menu.html.ep
 <ul id="menu"><li><a href="<%= url_for '/' %>"><%= __ 'Main page' %></a></li><li><a
     href="<%= url_for '/sitemap' %>"><%= __ 'Sitemap' %></a></li><li><form
-    action="<%= url_for '/set_language' %>" onchange="this.submit()"><%= select_field 'language' => [[ __ 'Language' => '' ], [ 'English' => 'en' ], [ 'Русский' => 'ru' ], ]%></form></li><li><form
+    action="<%= url_for '/set_language' %>" onchange="this.submit()"><select name="language"><option value=""><%= __ 'Language' %></option><option value="en">English</option><option value="ru">Русский</option></select></form></li><li><form
     action="<%= url_for '/search' %>"><input type="text" name="query"></form></li></ul>
 
 @@ style.css.html.ep
