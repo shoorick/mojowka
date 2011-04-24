@@ -27,12 +27,19 @@ Before first run you must create database:
 Registered users can change content of pages and upload images.
 There's one user: admin with same password.
 
-Go to http://127.0.0.1:3000/desired_page for creating new page
+Go  to http://127.0.0.1:3000/desired_page for creating new page
 and to http://127.0.0.1:3000/images/desired_image for uploading.
+
+Prerequisites:
+    Mojolicious::Lite
+    DBI
+    Locale::TextDomain (libintl)
+    Text::Textile
+        and
+    Mojolicious::Plugin::Textdomain (https://bitbucket.org/nuclon/mojolicious-plugin-textdomain)
 
 
 Alexander Sapozhnikov
 http://shoorick.ru/
 shoorick@cpan.org
-
 
