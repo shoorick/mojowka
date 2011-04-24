@@ -337,3 +337,7 @@ msgstr "Выйти"
 msgid "Edit this page"
 msgstr "Изменить эту страницу"
 
+#: ../mojowka:981
+msgid "Language"
+msgstr "Язык"
+
