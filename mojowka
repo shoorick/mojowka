@@ -759,6 +759,7 @@ __DATA__
 
 @@ upload_image.html.ep
 % layout 'default';
+%# TODO replace __ with __p
 <p><%= __ 'Image uploaded as' %> <a href="<%= url_for $link %>"><%= url_for $link %></a>:
 <br><img src="<%= url_for $link %>" alt="<%= __ 'Just uploaded' %>"></p>
 <p>You can insert this image to pages with following code:</p>

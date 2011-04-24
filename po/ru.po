@@ -75,7 +75,6 @@ msgid "Exact matching found"
 msgstr "Найдено точное соответствие"
 
 #: ../mojowka.tmp:491
-#, fuzzy, perl-brace-format
 msgid "Found {count} page"
 msgid_plural "Found {count} pages"
 msgstr[0] "Найдена {count} страница"
@@ -190,26 +189,139 @@ msgstr "ОШИБКА"
 msgid "Can not preview"
 msgstr "Не могу показать"
 
+#: ../mojowka:893
 msgid "Save"
 msgstr "Сохранить"
 
+#: ../mojowka:677
 msgid "Strong password"
 msgstr "Хороший пароль"
 
+#: ../mojowka:680
 msgid "Empty password"
 msgstr "Пустой пароль"
 
+#: ../mojowka:683
 msgid "Too short password"
 msgstr "Слишком короткий пароль"
 
+#: ../mojowka:686
 msgid "Password and login are equal"
 msgstr "Пароль совпадает с именем пользователя"
 
+#: ../mojowka:689
 msgid "Missing digits"
 msgstr "Отсутствуют цифры"
 
+#: ../mojowka:692
 msgid "Missing small letters"
 msgstr "Отсутствуют маленькие буквы"
 
+#: ../mojowka:695
 msgid "Missing capital letters"
 msgstr "Отсутствуют большие буквы"
+
+# extracted by extract.pl
+
+#: ../mojowka:665
+#: ../mojowka:711
+#: ../mojowka:942
+msgid "Change password"
+msgstr "Сменить пароль"
+
+#: ../mojowka:714
+msgid "Old Password"
+msgstr "Старый пароль"
+
+#: ../mojowka:715
+msgid "New Password"
+msgstr "Новый пароль"
+
+#: ../mojowka:717
+msgid "Repeat new password"
+msgstr "Повторите новый пароль"
+
+#: ../mojowka:726
+msgid "Sitemap"
+msgstr "Карта сайта"
+
+#: ../mojowka:731
+msgid "Main page"
+msgstr "Главная страница"
+
+#: ../mojowka:735
+msgid "Special pages"
+msgstr "Специальные страницы"
+
+#: ../mojowka:762
+msgid "Image uploaded as"
+msgstr "Изображение загружено как"
+
+#: ../mojowka:770
+msgid "Not Found - ERROR 404"
+msgstr "Не найдено - ОШИБКА 404"
+
+#: ../mojowka:771
+msgid "Not found"
+msgstr "Не найдено"
+
+#: ../mojowka:771
+msgid "Document you requested was not found."
+msgstr "Запрошенный документ не найден."
+
+#: ../mojowka:784
+msgid "Image you requested was not found."
+msgstr "Запрощенное изображение не найдено."
+
+#: ../mojowka:789
+msgid "Choose an image"
+msgstr "Выберите изображение"
+
+#: ../mojowka:790
+msgid "and"
+msgstr "и"
+
+#: ../mojowka:791
+msgid "Upload"
+msgstr "Загрузите"
+
+#: ../mojowka:877
+msgid "Title"
+msgstr "Заголовок"
+
+#: ../mojowka:879
+msgid "Content"
+msgstr "Содержимое"
+
+#: ../mojowka:881
+msgid "Bold"
+msgstr "Жирный"
+
+#: ../mojowka:882
+msgid "Italic"
+msgstr "Курсив"
+
+#: ../mojowka:890
+msgid "textile syntax"
+msgstr "язык разметки"
+
+#: ../mojowka:900
+msgid "Do you really want to delete this page?"
+msgstr "Вы действительно хотите удалить страницу?"
+
+#: ../mojowka:924
+msgid "Welcome"
+msgstr "Добро пожаловать"
+
+#: ../mojowka:940
+msgid "Logged as"
+msgstr "Вошёл как"
+
+#: ../mojowka:943
+msgid "Logout"
+msgstr "Выйти"
+
+#: ../mojowka:945
+msgid "Edit this page"
+msgstr "Изменить эту страницу"
+
