@@ -65,6 +65,13 @@ plugin 'textdomain' => {
     'default_language'    => 'en',
 };
 
+app->hook( 'after_static_dispatch' => sub {
+    my $self = shift;
+    my $lang = $self->detect_language;
+    app->log->debug( "lang=$lang" );
+    $self->set_language( $lang );
+});
+
 # my $JQUERY_URL = '/jquery-1.5.1.min.js';
 # http://ajax.googleapis.com/ajax/libs/jquery/1.4.1/jquery.min.js
 
@@ -187,7 +194,7 @@ get '/(*title)'       => \&get_article;
 get '/'               => \&get_article;
 
 app->types->type( 'html' => 'text/html; charset=utf-8' );
-app->secret( 'mojowka' );
+app->secret( 'mojoWka' );
 app->start( @ARGV ? @ARGV : 'daemon' );
 
 END { my $rc = $dbh->disconnect }
@@ -233,6 +240,7 @@ sub get_article {
     my $title = $self->param('title') || '';
     $title =~  s/\.html$//;
     $title =~ tr/_/ /;
+
 
     my $row = $dbh->selectrow_hashref(
         q{SELECT * FROM page WHERE LOWER(title)=LOWER(?)},
