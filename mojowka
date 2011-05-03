@@ -627,10 +627,15 @@ sub upload_image {
 
     my $image_link = substr( $image_file, length app->static->root );
 
-
     # Save to file
     $image->move_to($image_file);
     
+    $dbh->do(
+        q{INSERT INTO image (filename) VALUES(?)},
+        {},
+        $image_link,
+    );
+
     $self->render(
         'title'    => b( __ 'Image uploaded' )->decode( 'UTF-8' ),
         'link'     => $image_link,
