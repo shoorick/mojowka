@@ -151,6 +151,25 @@ get '/sitemap' => sub {
     );
 };
 
+get '/tags' => sub {
+    my $self = shift;
+
+    my $rows = $dbh->selectcol_arrayref(
+        q{SELECT title FROM tag ORDER BY LOWER(title)},
+    );
+
+    return undef unless $rows;
+
+    foreach my $row ( @$rows ) {
+        $row = b( $row )->decode('UTF-8')->to_string;
+    }
+
+    return $self->render(
+        'rows'     => $rows,
+        'template' => 'tags',
+    );
+};
+
 get '/search/:query' => \&search;
 get '/search'        => \&search;
 
@@ -766,6 +785,17 @@ __DATA__
 <li><a href="<%= url_for '/search'  %>"><%= __ 'Search' %></a></li>
 <li><a href="<%= url_for '/sitemap' %>"><%= __ 'Sitemap' %></a></li>
 <li><a href="<%= url_for '/login'   %>"><%= __ 'Login' %></a></li>
+</ul>
+
+
+@@ tags.html.ep
+% layout 'default', 'title' => __ 'Tags';
+<ul>
+% for my $row ( @$rows ) {
+%   my $link = $row;
+%   $link =~ tr/ /_/;
+    <li><a href="<%= url_for "/tags/$link" %>"><%= $row %></a></li>
+% }
 </ul>
 
 

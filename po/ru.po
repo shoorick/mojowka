@@ -341,3 +341,6 @@ msgstr "Изменить эту страницу"
 msgid "Language"
 msgstr "Язык"
 
+#: ../mojowka:792
+msgid "Tags"
+msgstr "Метки"
