@@ -170,6 +170,32 @@ get '/tags' => sub {
     );
 };
 
+get '/tags/:tag' => sub {
+    my $self = shift;
+    my $tag  = $self->param('tag');
+
+    my $rows = $dbh->selectall_arrayref(
+        q{
+            SELECT filename,image.text
+            FROM image
+            LEFT JOIN image_tag
+                ON image_tag.image=image.id
+            LEFT JOIN tag
+                ON image_tag.tag=tag.id
+            WHERE LOWER(tag.title)=LOWER(?)
+        },
+        { Slice => {} },
+        $tag, 
+    );
+
+    return $self->render(
+        'tag'       => $tag,
+        'base'      => $IMAGE_BASE,
+        'rows'      => $rows,
+        'template'  => 'tagstag',
+    );
+};
+
 get '/search/:query' => \&search;
 get '/search'        => \&search;
 
@@ -583,7 +609,7 @@ sub change_password {
         $redirect = "/profile/$login";
     }
     else {
-        $self->flash( 'message' => 'Can not change password' );
+        $self->flash( 'message' => __ 'Can not change password' );
     }
 
     $self->redirect_to( $redirect );
@@ -644,7 +670,7 @@ sub upload_image {
     $image_file = "$IMAGE_DIR/$title." . $i++ . ".$ext"
         while -f $image_file;
 
-    my $image_link = substr( $image_file, length app->static->root );
+    my $image_link = substr( $image_file, length $IMAGE_DIR );
 
     # Save to file
     $image->move_to($image_file);
@@ -657,6 +683,7 @@ sub upload_image {
 
     $self->render(
         'title'    => b( __ 'Image uploaded' )->decode( 'UTF-8' ),
+        'base'     => $IMAGE_BASE,
         'link'     => $image_link,
         'template' => 'upload_image',
     );
@@ -799,6 +826,15 @@ __DATA__
 </ul>
 
 
+@@ tagstag.html.ep
+% layout 'default', 'title' => __x '{tag} tagged images', 'tag' => $tag;
+<ul class="gallery">
+% for my $row ( @$rows ) {
+    <li><a href="<%= url_for( $base . '/' . $row->{'filename'} ) %>"><img src="<%= url_for ( $base . '/tn/' . $row->{'filename'} ) %>" alt="<%= $row->{'text'}%>"></a></li>
+% }
+</ul>
+
+
 @@ search.html.ep
 % layout 'default';
 <form action="<%= url_for '/search' %>">
@@ -818,10 +854,11 @@ __DATA__
 
 @@ upload_image.html.ep
 % layout 'default';
+%# my $base = param 'base';
 <p><%= __x 'Image uploaded and saved as {link}', 'link' => url_for $link %>
-<br><img src="<%= url_for $link %>" alt="<%= __ 'Just uploaded' %>"></p>
+<br><img src="<%= url_for "$base/$link" %>" alt="<%= __ 'Just uploaded' %>"></p>
 <p><%= __ 'You can insert this image to pages with following code:' %></p>
-<blockquote><code>!<%= url_for $link %>!</code></blockquote>
+<blockquote><code>!<%= url_for "$base/$link" %>!</code></blockquote>
 
 
 @@ not_found.html.ep
@@ -843,9 +880,10 @@ __DATA__
 <h1><%= __ 'Not found' %></h1><p><%= __ 'Image you requested was not found.' %></p>
 <ul>
 % my $article_title = param 'title';
+% my $base          = param 'base';
 <li><a href="<%= url_for "/search/$article_title" %>"><%= __x  'Search for &ldquo;{title}&rdquo;', 'title' => $article_title %></a></li>
 % if ( session 'login' ) {
-<li><form action="<%= url_for "/images/$article_title" %>" method="post" enctype ="multipart/form-data"><%= __ 'Choose an image' %>
+<li><form action="<%= url_for "$base/$article_title" %>" method="post" enctype ="multipart/form-data"><%= __ 'Choose an image' %>
 <input type="file" name="file"> <%= __ 'and' %>
 <input type="submit" value="<%= __ 'Upload' %>"></form></li>
 % }
