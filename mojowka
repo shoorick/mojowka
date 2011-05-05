@@ -867,9 +867,9 @@ __DATA__
 <h1><%= __ 'Not found' %></h1><p><%= __ 'Document you requested was not found.' %></p>
 <ul>
 % my $article_title = param 'title';
-<li><a href="<%= url_for "/search/$article_title" %>"><%= __x  'Search for &ldquo;{title}&rdquo;', 'title' => $article_title %></a></li>
+<li><a href="<%= url_for "/search/$article_title" %>"><%== __x  'Search for &ldquo;{title}&rdquo;', 'title' => $article_title %></a></li>
 % if ( session 'login' ) {
-<li><a href="<%= url_for "/create/$article_title" %>"><%= __x 'Create page &ldquo;{title}&rdquo;', 'title' => $article_title %></a></li>
+<li><a href="<%= url_for "/create/$article_title" %>"><%== __x 'Create page &ldquo;{title}&rdquo;', 'title' => $article_title %></a></li>
 % }
 </ul>
 
@@ -881,7 +881,7 @@ __DATA__
 <ul>
 % my $article_title = param 'title';
 % my $base          = param 'base';
-<li><a href="<%= url_for "/search/$article_title" %>"><%= __x  'Search for &ldquo;{title}&rdquo;', 'title' => $article_title %></a></li>
+<li><a href="<%= url_for "/search/$article_title" %>"><%== __x  'Search for &ldquo;{title}&rdquo;', 'title' => $article_title %></a></li>
 % if ( session 'login' ) {
 <li><form action="<%= url_for "$base/$article_title" %>" method="post" enctype ="multipart/form-data"><%= __ 'Choose an image' %>
 <input type="file" name="file"> <%= __ 'and' %>
