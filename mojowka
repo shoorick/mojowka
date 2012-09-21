@@ -51,7 +51,7 @@ our $IMAGE_BASE
 
 # Directory to save image files
 # http://d.hatena.ne.jp/yukikimoto/20100212/1265989676
-my $IMAGE_DIR  = app->static->root . $IMAGE_BASE;
+my $IMAGE_DIR  = ${app->static->paths}[0] . $IMAGE_BASE;
 unless (-d $IMAGE_DIR) {
     mkpath $IMAGE_DIR or die "Cannot create directory: $IMAGE_DIR";
 }
@@ -1004,8 +1004,7 @@ button:hover{border-color:#69c}
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
 <html>
     <head>
-% $title = b( $title || __ 'ERROR' )->decode('UTF-8')->to_string; 
-        <title><%= $title %></title>
+        <title><%= $title || __ 'ERROR' %></title>
         <style type="text/css">body{background:#fec;color:#000}h1{color:#900}</style>
     </head>
     <body>
