@@ -70,7 +70,6 @@ app->hook( 'after_static_dispatch' => sub {
     $self->set_language( $self->session( 'language' ) || $self->detect_language );
 });
 
-my $JQUERY_URL = 'https://ajax.googleapis.com/ajax/libs/jquery/1.8.2/jquery.min.js';
 
 # Routes
 
@@ -729,7 +728,7 @@ __DATA__
 
 @@ change_password.html.ep
 % layout 'default';
-<script type="text/javascript" src="<%= $JQUERY_URL %>"></script>
+%= include 'jquery';
 <script type="text/javascript">
     function compare_passwords(){
         if ( $('#new_password').val() == $('#repeat_new_password').val() ) {
@@ -891,7 +890,7 @@ __DATA__
 
 @@ edit_article.html.ep
 % layout 'default';
-<script type="text/javascript" src="<%= $JQUERY_URL %>"></script>
+%= include 'jquery';
 <script type="text/javascript" src="<%= url_for '/jquery-ui-1.8.11.custom.min.js' %>"></script>
 <script type="text/javascript" src="<%= url_for '/jquery.caret.1.02.min.js' %>"></script>
 <script type="text/javascript">
@@ -1026,7 +1025,7 @@ button:hover{border-color:#69c}
     <body>
 %= include 'menu';
 % if ( my $message = flash 'message' ) {
-        <div id="message"><%= b( $message )->decode('UTF-8')->to_string %></div>
+        <div id="message"><%= $message %></div>
 % }
 
 % if ( my $login = session 'login' ) {
@@ -1045,6 +1044,16 @@ button:hover{border-color:#69c}
     </body>
 </html>
 
+@@ jquery.html.ep
+<%= javascript 'http://ajax.googleapis.com/ajax/libs/jquery/1.8.2/jquery.min.js' %>
+<%= javascript begin %>
+    if (typeof jQuery == 'undefined') {
+      var e = document.createElement('script');
+      e.src = '/js/jquery.js';
+      e.type = 'text/javascript';
+      document.getElementsByTagName("head")[0].appendChild(e);
+    }
+<% end %>
 
 @@ menu.html.ep
 <ul id="menu"><li><a href="<%= url_for '/' %>"><%= __ 'Main page' %></a></li><li><a
