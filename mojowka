@@ -33,13 +33,14 @@ use File::Path     'mkpath';
 use Mojo::ByteStream 'b';
 use Text::Textile;
 
-our $VERSION=0.03;
+our $VERSION=0.04;
 
 my $dbfile
     = $ENV{'MOJOWKA_DATAFILE'}
     || 'data.sqlite';
 
-our $dbh = DBI->connect("dbi:SQLite:dbname=$dbfile", '', '');
+#our $dbh = DBI->connect("dbi:SQLite:dbname=$dbfile", undef, undef);
+our $dbh = DBI->connect("dbi:SQLite:dbname=$dbfile", undef, undef, {sqlite_unicode => 1});
 
 our $txt = Text::Textile->new;
     $txt->charset('utf-8');
@@ -65,7 +66,7 @@ plugin 'textdomain' => {
     'default_language'    => 'en',
 };
 
-app->hook( 'after_static_dispatch' => sub {
+app->hook( 'before_routes' => sub {
     my $self = shift;
     $self->set_language( $self->session( 'language' ) || $self->detect_language );
 });
