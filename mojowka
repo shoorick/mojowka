@@ -1017,6 +1017,7 @@ button:hover{border-color:#69c}
 
 
 @@ layouts/default.html.ep
+% use Mojo::ByteStream 'b';
 <!DOCTYPE html>
 <html>
     <head><title><%= $title || __ 'Welcome'%></title>
@@ -1029,7 +1030,7 @@ button:hover{border-color:#69c}
     <body>
 %= include 'menu';
 % if ( my $message = flash 'message' ) {
-        <div id="message"><%= $message %></div>
+        <div id="message"><%= b( $message )->decode('UTF-8')->to_string %></div>
 % }
 
 % if ( my $login = session 'login' ) {
