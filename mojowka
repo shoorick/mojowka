@@ -893,6 +893,7 @@ __DATA__
 
 @@ edit_article.html.ep
 % layout 'default';
+% use Mojo::ByteStream 'b';
 %= include 'jquery';
 <script type="text/javascript" src="<%= url_for '/jquery-ui-1.8.11.custom.min.js' %>"></script>
 <script type="text/javascript" src="<%= url_for '/jquery.caret.1.02.min.js' %>"></script>
