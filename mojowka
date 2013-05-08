@@ -133,7 +133,7 @@ get '/set_language/:language' => \&set_language;
 post '/preview' => sub {
     my $self = shift;
     my $text = $self->param('article') || return;
-    $self->render( 'text' => &markup( $text ) );
+    $self->render( 'text' => markup( $text ) );
 };
 
 get '/sitemap' => sub {
@@ -150,7 +150,6 @@ get '/sitemap' => sub {
     }
 
     return $self->render(
-        'template'         => 'sitemap',
         'rows'             => $rows,
     );
 };
@@ -170,7 +169,6 @@ get '/tags' => sub {
 
     return $self->render(
         'rows'     => $rows,
-        'template' => 'tags',
     );
 };
 
@@ -196,7 +194,6 @@ get '/tags/:tag' => sub {
         'tag'       => $tag,
         'base'      => $IMAGE_BASE,
         'rows'      => $rows,
-        'template'  => 'tagstag',
     );
 };
 
@@ -214,7 +211,6 @@ under sub {
     # Not authenticated
     $self->flash( 'message' => __ 'You are not logged in' );
     $self->render(
-        'template' => 'login',
         'status'   => 401,
     );
     return;
