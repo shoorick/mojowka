@@ -31,9 +31,13 @@ use DBI;
 use File::Basename 'basename';
 use File::Path     'mkpath';
 use Mojo::ByteStream 'b';
+use Mojo::Log;
 use Text::Textile;
 
+
 our $VERSION=0.04;
+
+my $log = Mojo::Log->new;
 
 my $dbfile
     = $ENV{'MOJOWKA_DATAFILE'}
@@ -70,6 +74,7 @@ app->hook( 'before_routes' => sub {
     my $self = shift;
     $self->set_language( $self->session( 'language' ) || $self->detect_language );
 });
+
 
 
 # Routes
@@ -270,6 +275,7 @@ sub markup {
         sprintf q{"%s":/%s}, $text, $link;
     }gex;
 
+    $log->debug("Textiling of $_");
     return $txt->process( $_ );
 
 } # sub markup
@@ -1000,7 +1006,7 @@ button:hover{border-color:#69c}
 
 
 @@ layouts/error.html.ep
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<!DOCTYPE html>
 <html>
     <head>
         <title><%= $title || __ 'ERROR' %></title>
@@ -1014,7 +1020,7 @@ button:hover{border-color:#69c}
 
 
 @@ layouts/default.html.ep
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<!DOCTYPE html>
 <html>
     <head><title><%= $title || __ 'Welcome'%></title>
     <link rel="shortcut icon" href="<%= url_for '/favicon.ico' %>">
