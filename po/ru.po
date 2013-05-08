@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: 0.0.3\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2011-04-24 15:01+0600\n"
-"PO-Revision-Date: 2011-04-24 02:00+0600\n"
+"PO-Revision-Date: 2013-05-09 02:00+0600\n"
 "Last-Translator: Alexander Sapozhnikov <shoorick@cpan.org>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "Language: Russian\n"
@@ -283,7 +283,7 @@ msgstr "Запрошенный документ не найден."
 
 #: ../mojowka:784
 msgid "Image you requested was not found."
-msgstr "Запрощенное изображение не найдено."
+msgstr "Запрошенное изображение не найдено."
 
 #: ../mojowka:789
 msgid "Choose an image"
