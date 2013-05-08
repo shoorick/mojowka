@@ -271,7 +271,7 @@ sub markup {
         sprintf q{"%s":/%s}, $text, $link;
     }gex;
 
-    $log->debug("Textiling of $_");
+#    $log->debug("Textiling of $_");
     return $txt->process( $_ );
 
 } # sub markup
