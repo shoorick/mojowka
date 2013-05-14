@@ -289,7 +289,6 @@ sub get_article {
     $title =~  s/\.html$//;
     $title =~ tr/_/ /;
 
-
     my $row = $dbh->selectrow_hashref(
         q{SELECT * FROM page WHERE LOWER(title)=LOWER(?)},
         {},
@@ -301,8 +300,8 @@ sub get_article {
         'status'   => 404,
     ) unless $row;
 
-    $self->render_text(
-        markup( b( $row->{'text'} )->decode('UTF-8')->to_string ),
+    $self->render(
+        'text'   => markup( $row->{'text'} ),
         'title'  => $title,
         'layout' => 'default',
         'id'     => $row->{'id'},
@@ -707,6 +706,11 @@ sub set_language {
 } # sub set_language
 
 __DATA__
+
+@@ title.html.ep
+% layout 'default';
+%= $text
+
 
 @@ userlist.html.ep
 % layout 'default', 'title' => __ 'User list';
