@@ -2,3 +2,5 @@ Build
 MYMETA.json
 MYMETA.yml
 _build/
+
+data.sqlite
