@@ -4,3 +4,6 @@ MYMETA.yml
 _build/
 
 data.sqlite
+
+.komodotools
+*.komodoproject
