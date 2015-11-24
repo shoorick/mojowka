@@ -469,8 +469,8 @@ sub get_user {
         $login,
     );
 
-    return $self->render_text(
-        markup( b( $row->{'text'} )->decode('UTF-8')->to_string ),
+    return $self->render(
+        'text'   => markup( b( $row->{'text'} )->decode('UTF-8')->to_string ),
         'title'  => $login,
         'layout' => 'default',
     ) if $row;
