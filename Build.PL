@@ -24,6 +24,8 @@ my $build = Module::Build->new(
     'Text::Textile' => 0,
     'DBI' => 0,
     'DBD::SQLite' => 0,
+    'Locale::TextDomain' => 0,
+    'Mojolicious::Plugin::Textdomain' => 0,
   },
   'dist_version_from' => 'mojowka'
 );
