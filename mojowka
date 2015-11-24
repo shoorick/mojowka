@@ -13,7 +13,7 @@ mojowka - is a L<Mojolicious::Lite> based lightweight wiki.
 Alexander Sapozhnikov
 L<http://shoorick.ru/>
 L<< E<lt>shoorick@cpan.orgE<gt> >>
-2000-2011
+2000-2015
 
 =head1 LICENSE
 
@@ -35,7 +35,7 @@ use Mojo::Log;
 use Text::Textile;
 
 
-our $VERSION=0.04;
+our $VERSION=0.05;
 
 my $log = Mojo::Log->new;
 
@@ -241,7 +241,8 @@ get '/(*title)'       => \&get_article;
 get '/'               => \&get_article;
 
 app->types->type( 'html' => 'text/html; charset=utf-8' );
-app->secret( 'mojoWka' );
+app->secrets([ 'mojoWka' ]);
+
 app->start( @ARGV ? @ARGV : 'daemon' );
 
 END { my $rc = $dbh->disconnect }
